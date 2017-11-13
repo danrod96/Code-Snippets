@@ -1,0 +1,4 @@
+name = ADC Polls
+description = "Extend Drupal Poll Module for enabling anonymous users to vote more than once"
+package = Esinergia
+core = 7.x
