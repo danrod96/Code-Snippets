@@ -2,7 +2,7 @@
  * @file
  * Javascript for Goole Map Dynamic API Formatter javascript code.
  *
- * Many thanks to Lukasz Klimek http://www.klimek.ws for the help
+ * Some snippets taken from Lukasz Klimek http://www.klimek.ws
  */
 
 (function($) {

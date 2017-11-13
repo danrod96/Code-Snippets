@@ -1,5 +1,5 @@
 name = Geolocation Alter
-description = Fix multiple dynamic widget
+description = Custom Changes for the geolocation contrib module
 core = 7.x
 package = Comfandi
 
