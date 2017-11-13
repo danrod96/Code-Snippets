@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * Implements hook_js_alter().
+ */
+function co_geolocation_alter_js_alter(&$javascript) {
+    $maps_js = drupal_get_path('module', 'geolocation_googlemaps') . '/geolocation_googlemaps_dynamic_formatter.js';
+
+    if (isset($javascript[$maps_js])) {
+        $javascript_record = array(
+            'group' => 0,
+            'weight' => 0,
+            'version' => '1.0',
+            'every_page' => FALSE,
+            'type' => 'file',
+            'scope' => 'header',
+            'cache' => TRUE,
+            'defer' => FALSE,
+            'preprocess' => TRUE,
+            'data' => drupal_get_path('module', 'co_geolocation_alter') . '/js/geolocation_googlemaps_dynamic_formatter.js',
+        );
+
+        $javascript[$maps_js] = $javascript_record;
+    }
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function co_geolocation_alter_node_view($node, $view_mode, $langcode){
+    if (isset($node->field_geolocation[LANGUAGE_NONE][0]['lat']) && isset($node->field_geolocation[LANGUAGE_NONE][0]['lng']) && !empty($node->field_geolocation[LANGUAGE_NONE][0]['lat']) && !empty($node->field_geolocation[LANGUAGE_NONE][0]['lng'])){
+
+            if (isset($node->field_adress[LANGUAGE_NONE][0]['value']) && !empty($node->field_adress[LANGUAGE_NONE][0]['value'])){
+                $direccion = $node->field_adress[LANGUAGE_NONE][0]['value'];
+            } else {
+                $direccion = "";
+            }
+
+            if (isset($node->field_text_1[LANGUAGE_NONE][0]['value']) && !empty($node->field_text_1[LANGUAGE_NONE][0]['value'])){
+                $lugar = $node->field_text_1[LANGUAGE_NONE][0]['value'];
+            } else {
+                $lugar = $node->title;
+            }
+
+            $settings = array(
+                'coGeolocationAlter' => array(
+                    'direccion' => $direccion ,
+                    'lugar' => $lugar,
+                ),
+            );
+
+            drupal_add_js($settings, 'setting');
+    }
+}

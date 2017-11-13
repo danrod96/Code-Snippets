@@ -1,0 +1,6 @@
+name = Geolocation Alter
+description = Fix multiple dynamic widget
+core = 7.x
+package = Comfandi
+
+dependencies[] = geolocation

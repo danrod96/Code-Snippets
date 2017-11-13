@@ -1,0 +1,4179 @@
+<?php
+
+/**
+ * @file
+ * Migrate ADC
+ */
+
+require_once dirname(__FILE__) . '/adc_migration_helper.inc';
+
+/* Drupal Hooks */
+
+/**
+ * Implements hook_menu().
+ *
+ * Many helper functions for updating content already migrated, and in some cases, creating new content from scratch.
+ *
+ * There were cases in which was faster to use calls to entity_create and entity_metadata_wrapper for creating new content, rather than
+ * using the batch process from the migrate module.
+ */
+function adc_migration_menu() {
+
+  $items['update-body-content'] = array(
+    'title' => 'Update Body Content for some nodes',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_content',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-image-producto'] = array(
+    'title' => 'Actualizar Imagen Producto',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_image',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-fecha-ordenamiento'] = array(
+    'title' => 'Actualizar Fecha ordenamiento',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_fecha_ordenamiento',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-fechas-publicaciones'] = array(
+    'title' => 'Actualizar Fechas Publicaciones',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_fechaS_publicaciones',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-fechas-alt-pie'] = array(
+    'title' => 'Actualizar ALT y Pie de pagina',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_alt_pie',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-informacion-directorios'] = array(
+    'title' => 'Actualizar Informacion Directorios',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_informacion_directorios',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-informacion-clasificados'] = array(
+    'title' => 'Actualizar Informacion Clasificados',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_informacion_clasificados',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['migrate-informacion-contactenos'] = array(
+    'title' => 'Actualizar Informacion Contactenos',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_migrate_informacion_contactenos',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-supervisores-contratos'] = array(
+    'title' => 'Actualizar Contratos con Supervisores',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_supervisores_contratos',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['migrate-informacion-eventos'] = array(
+    'title' => 'Migracion Eventos',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_migrate_eventos',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-informacion-talleres'] = array(
+    'title' => 'Actualizar Informacion Talleres',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_talleres',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-informacion-producto-talleres'] = array(
+    'title' => 'Actualizar Informacion Producto Talleres',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_producto_talleres',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-informacion-links-relacionados'] = array(
+    'title' => 'Actualizar Informacion Links Relacionados',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_links_relacionados',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-informacion-images'] = array(
+    'title' => 'Actualizar Informacion de las imagenes',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_info_imagenes',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['migrate-informacion-encuestas'] = array(
+    'title' => 'Actualizar o Migrar Informacion Contactenos',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_migrate_encuestas',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-informacion-faq'] = array(
+    'title' => 'Actualizar o Migrar Informacion FAQ',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_migrate_faq',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['migrate-informacion-glosario'] = array(
+    'title' => 'Actualizar o Migrar Informacion Glosario',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_migrate_glosario',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['migrate-informacion-foros'] = array(
+    'title' => 'Actualizar o Migrar Informacion Foros',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_migrate_foros',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['update-informacion-noticias-publicaciones'] = array(
+    'title' => 'Actualizar o Migrar Informacion Foros',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_update_informacion_noticias_publicaciones',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['correccion-fotos-noticias-publicaciones'] = array(
+    'title' => 'Correccion Fotos Noticias y Publicaciones',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_correccion_fotos_noticias_publicaciones',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['migrate-informacion-asesorias'] = array(
+    'title' => 'Actualizar o Migrar Informacion Asesorias',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_migrate_asesorias',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['migrate-procesos-contratacion'] = array(
+    'title' => 'Actualizar o Migrar Informacion Procesos Contratacion',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_migrate_procesos_contratacion',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['validar-archivos-eventos'] = array(
+    'title' => 'Validar Archivos Eventos',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_validar_archivos_eventos',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['imagenes-migrar-noticias-publicaciones'] = array(
+    'title' => 'Migrar Imagenes viejas del body Noticias/Publicaciones',
+    'access arguments' => FALSE,
+    'page callback' => '_adc_migration_imagenes_body_noticias_publicaciones',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_mail_alter().
+ */
+function adc_migration_mail_alter(&$message) {
+  // $message['send'] = FALSE;
+}
+
+function _adc_migration_update_content(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/publicacion-noticia.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+  $totales = "/tmp/totales.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file,0,'~')) !== FALSE) {
+   $id = $line[0];
+   if($line[0]){
+    $id = str_replace(".", "", $id);
+    $id = str_replace(",", "", $id);
+    $id = (int) $id;
+
+	  if ($id == "contenido_id"){
+	   continue;
+	  }
+    $result = db_query("SELECT entity_id FROM field_data_field_contenido_id WHERE field_contenido_id_value = :contenido_id LIMIT 1", array(":contenido_id" => $id))->fetchAssoc();
+
+	  if (!empty($result['entity_id'])){
+	    $contenido = node_load($result['entity_id']);
+
+	    drupal_set_message(t("Updating node @node body With External id @external", array("@node" => $contenido->nid, "@external" => $id)), "status");
+
+      $contenido->title                                      = $line[1];
+      $contenido->field_elaborado_por[LANGUAGE_NONE][0]['value']     = $line[2];
+      $summary                                               = strip_tags(html_entity_decode($line[3]));
+      $contenido->body[LANGUAGE_NONE][0]['summary']                  = $summary;
+      $contenido->body[LANGUAGE_NONE][0]['safe_summary']             = $summary;
+      $contenido->status                                     = 0;
+      if ($line[4] == 'A'){
+          $contenido->status = 1;
+      }
+      $contenido->field_fecha_publicacion[LANGUAGE_NONE][0]['value'] = strtotime(_get_format_date($line[5]));
+
+      $contenido->body[LANGUAGE_NONE][0]['value']                    = $line[8].$line[9].$line[10];
+	    node_save($contenido);
+
+      //actualizar directamente en la BD las fechas de creacion y actualizacion
+      $timestamp_creation = strtotime(_get_format_date($line[6]));
+      $timestamp_modification = strtotime(_get_format_date($line[7]));
+
+      if (!($timestamp_creation > 0)){
+        $timestamp_creation = time();
+      }
+
+      if (!($timestamp_modification > 0)){
+        $timestamp_modification = time();
+      }
+
+      //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+      $updated = db_update('node')
+        ->fields(array(
+          'created' => $timestamp_creation,
+          'changed' => $timestamp_modification,
+        ))
+        ->condition('nid', $result['entity_id'], '=')
+        ->execute();
+
+      if ($updated < 1){
+        drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $result['entity_id'])), "status");
+      }
+
+
+
+	    $arreglo_updated[] = $result['entity_id'];
+	    $index_updated++;
+	    $last_record = $id;
+      file_put_contents($updated_nodes, json_encode($arreglo_updated));
+      file_put_contents("/tmp/lastrecord.json", json_encode($last_record));  
+	  } else {
+	  	//Intentar hacer match por el titulo
+		  	$arreglo_notupdated[] = $id;
+		  	$index_not_updated++;
+        file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated)); 
+	  }
+    file_put_contents($totales, json_encode(array('updated'=>$index_updated,'notupdated'=>$index_not_updated)));
+	}
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated)); 
+
+  return t('Done Updating Contents');
+}
+
+function _adc_migration_update_image(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/images.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+  	$id = $line[1];
+
+	if ($id == "id_producto"){
+	  continue;
+	}
+
+	$result = db_query("SELECT entity_id FROM field_data_field_id_anterior_prod_artes WHERE field_id_anterior_prod_artes_value  = :contenido_id LIMIT 1", array(":contenido_id" => $id))->fetchAssoc();
+
+	if (!empty($result['entity_id'])){
+	    $contenido = node_load($result['entity_id']);
+
+	    drupal_set_message(t("Updating node @node image With External id @external", array("@node" => $contenido->nid, "@external" => $id)), "status");
+
+	    $imagen = $line[3];
+
+        $filepath = drupal_realpath("public://imagenes/" . $imagen);
+        $file_contents = file_get_contents($filepath);
+
+        if (empty($file_contents)){
+	    	drupal_set_message(t("Picture @foto associated with @external not on FS", array("@foto" => $imagen, "@external" => $id)), "status");
+			$arreglo_notupdated[] = $id;
+			$index_not_updated++;
+			continue;
+        }
+
+        $file_obj = file_save_data($file_contents, "public://" . drupal_basename($filepath), FILE_EXISTS_REPLACE);
+
+        $contenido->field_imagenes[LANGUAGE_NONE][0] = (array) $file_obj;
+
+       	node_save($contenido);
+
+	    unset($node);
+
+	    $arreglo_updated[] = $result['entity_id'];
+	    $index_updated++;
+	    $last_record = $id;
+	} else {
+		$arreglo_notupdated[] = $id;
+		$index_not_updated++;
+	}
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents');
+}
+
+function _adc_migration_update_fecha_ordenamiento(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/updates-fechamod.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+   $id = $line[0];
+
+   if($line[0]){
+	  $id = str_replace(".", "", $id);
+	  $id = str_replace(",", "", $id);
+
+	  $id = (int) $id;
+
+	  if ($id == "contenido_id"){
+	  	continue;
+	  }
+
+	  $result = db_query("SELECT entity_id FROM field_data_field_contenido_id WHERE field_contenido_id_value = :contenido_id LIMIT 1", array(":contenido_id" => $id))->fetchAssoc();
+
+	  if (!empty($result['entity_id'])){
+	    $contenido = node_load($result['entity_id']);
+
+	    drupal_set_message(t("Updating node @node fecha ordenamiento With External id @external", array("@node" => $contenido->nid, "@external" => $id)), "status");
+
+	    $timestamp = strtotime($line[1]);
+
+	    $contenido->field_fecha_ordenamiento[LANGUAGE_NONE][0]['value'] = $timestamp;
+	    $contenido->field_fecha_ordenamiento[LANGUAGE_NONE][0]['timezone'] = 'America/Bogota';
+	    $contenido->field_fecha_ordenamiento[LANGUAGE_NONE][0]['timezone_db'] = 'UTC';
+	    $contenido->field_fecha_ordenamiento[LANGUAGE_NONE][0]['date_type'] = 'datestamp';
+
+	    node_save($contenido);
+
+	    unset($node);
+
+	    $arreglo_updated[] = $result['entity_id'];
+	    $index_updated++;
+	    $last_record = $id;
+	  } else {
+		$arreglo_notupdated[] = $id;
+		$index_not_updated++;
+	  }
+   }
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_update_fechaS_publicaciones(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/updates-varios.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+
+   $id = $line[0];
+
+  if($line[0]){
+    $id = str_replace(".", "", $id);
+    $id = str_replace(",", "", $id);
+
+    $id = (int) $id;
+
+    if ($id == "contenido_id"){
+      continue;
+    }
+
+    $result = db_query("SELECT entity_id FROM field_data_field_contenido_id WHERE field_contenido_id_value = :contenido_id LIMIT 1", array(":contenido_id" => $id))->fetchAssoc();
+
+    if (!empty($result['entity_id'])){
+      drupal_set_message(t("Updating node @node fecha creacion y modificicacion With External id @external", array("@node" => $contenido->nid, "@external" => $id)), "status");
+
+      $timestamp_creation = strtotime($line[1]);
+      $timestamp_modification = strtotime($line[2]);
+
+      if (!($timestamp_creation > 0)){
+        $timestamp_creation = time();
+      }
+
+      if (!($timestamp_modification > 0)){
+        $timestamp_modification = time();
+      }
+
+      //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+      $updated = db_update('node')
+        ->fields(array(
+          'created' => $timestamp_creation,
+          'changed' => $timestamp_modification,
+        ))
+        ->condition('nid', $result['entity_id'], '=')
+        ->execute();
+
+      if ($updated > 0){
+        $arreglo_updated[] = $result['entity_id'];
+        $index_updated++;
+        $last_record = $id;
+      }
+
+    } else {
+      $arreglo_notupdated[] = $id;
+      $index_not_updated++;
+    }
+
+  }
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_update_alt_pie(){
+  
+}
+
+function _adc_migration_update_informacion_directorios(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/updates-directorios.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+
+    $id = $line[0];
+    $correo = $line[2];
+
+    if($line[0]){
+
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "id_directorio"){
+        continue;
+      }
+
+      //extraer el nid asociado a ese directorio_id
+      $result2 = db_query("SELECT entity_id FROM field_data_field_id_de_directorio WHERE field_id_de_directorio_value = :id_directorio LIMIT 1", array(":id_directorio" => $id))->fetchAssoc();
+
+      //realizar las actualizaciones necesarias a nivel de db
+      if (!empty($result2['entity_id'])){
+
+        //cargar node y guardar la info necesaria
+        $node_dir = node_load($result2['entity_id']);
+
+        $id_usuario_artesano = $line[1];
+        $correo_artesano = $line[2];
+        $categoria_directorio = $line[3];
+        $perfil_directorio = $line[5];
+        $estado_directorio = $line[7];
+        $estado_publicacion = $line[9];
+        $usuario_creacion = $line[10];
+        $fecha_creacion = $line[11];
+        $fecha_modificacion = $line[13];
+        $texto_descripcion = $line[14];
+
+        $tid_estado_directorio = get_estado_publicacion($estado_directorio);
+
+        if (!$tid_estado_directorio){
+          $tid_estado_directorio = get_estado_publicacion('N');
+        }
+
+        //$node_dir->field_estado_directorio[LANGUAGE_NONE][0]['value'] = $tid_estado_directorio;
+
+        if ($estado_publicacion == 'A' || $estado_publicacion == 'V'){
+          $node_dir->status = 1;
+        } else {
+          $node_dir->status = 0;
+        }
+
+        drupal_set_message(t("Updating node @node directorio With External id @external", array("@node" => $node_dir->nid, "@external" => $id)), "status");
+
+        node_save($node_dir);
+
+        $transition = new WorkflowTransition();
+        $entity_type = 'node';
+        $field_name = 'field_estado_directorio';
+        $old_sid = $node_dir->field_estado_directorio[LANGUAGE_NONE][0]['value']; // sid of your Draft status
+        $new_sid = $tid_estado_directorio; // sid of your Saved status
+        $uid = 1; // You can change with uid of author.
+        $stamp = REQUEST_TIME;
+        $comment = 'Cambio estado directorio';
+        $transition->setValues($entity_type, $node_dir, $field_name, $old_sid, $new_sid, $uid, $stamp, $comment);
+        workflow_execute_transition($entity_type, $node_dir, $field_name, $transition, $force = TRUE);
+
+        //actualizar directamente en la BD las fechas de creacion y actualizacion
+        $timestamp_creation = strtotime($fecha_creacion);
+        $timestamp_modification = strtotime($fecha_modificacion);
+
+        if (!($timestamp_creation > 0)){
+          $timestamp_creation = time();
+        }
+
+        if (!($timestamp_modification > 0)){
+          $timestamp_modification = time();
+        }
+
+        //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+        $updated = db_update('node')
+          ->fields(array(
+            'created' => $timestamp_creation,
+            'changed' => $timestamp_modification,
+          ))
+          ->condition('nid', $result2['entity_id'], '=')
+          ->execute();
+
+        if ($updated < 1){
+          drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $result2['entity_id'])), "status");
+        }
+
+        $arreglo_updated[] = $node_dir->nid;
+        $index_updated++;
+        $last_record = $id;
+
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record));
+      } else {
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;
+      }
+
+    }
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_update_informacion_clasificados(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/updates-clasificados.csv';
+  $path_imagenes = DRUPAL_ROOT . '/sites/default/files/migration/anexo_imagenes.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+
+    $id = $line[0];
+
+    if($line[0]){
+
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "id_clasificado"){
+        continue;
+      }
+
+      //extraer el nid asociado a ese id_clasificado
+      $result2 = db_query("SELECT entity_id FROM field_data_field_id_clasificado WHERE field_id_clasificado_value = :id_clasificado LIMIT 1", array(":id_clasificado" => $id))->fetchAssoc();
+
+      //realizar las actualizaciones necesarias a nivel de db
+      if (!empty($result2['entity_id'])){
+
+        //cargar node y guardar la info necesaria
+        $node_clasi = node_load($result2['entity_id']);
+
+        $tipo_clasificado = $line[2];
+        $titulo_clasificado = $line[3];
+        $descripcion = $line[4];
+        $direccion = $line[8];
+        $telefono = $line[9];
+        $celular = $line[10];
+        $fax = $line[11];
+        $correo = $line[12];
+        $url = $line[13];
+        $fecha_inicio = $line[14];
+        $fecha_fin = $line[15];
+        $anexo = $line[16];
+        $estado_clasificado = $line[17];
+        $estado_publicacion = $line[18];
+        $id_usuario_creacion = $line[19];
+        $fecha_creacion = $line[20];
+        $fecha_modificacion = $line[22];
+
+        if ($estado_publicacion == 'A' || $estado_publicacion == 'V'){
+          $node_clasi->status = 1;
+          $estado_publicacion = 1;
+        } else {
+          $node_clasi->status = 0;
+          $estado_publicacion = 0;
+        }
+
+        /* $tid_tipo_clasificado = get_categoria_clasificado($tipo_clasificado);
+
+        if (!$tid_tipo_clasificado){
+          $tid_tipo_clasificado = get_categoria_clasificado(1);
+        }
+
+        $tid_estado_clasificado = get_estado_de_publicacion_clasificado($estado_clasificado);
+
+        $node_clasi->field_estado_clasificado[LANGUAGE_NONE][0]['value'] = get_estado_de_publicacion_clasificado('N');
+
+        $node_clasi->field_direccion_clasificado[LANGUAGE_NONE][0]['value'] = $direccion;
+
+        $node_clasi->field_telefono_clasificado[LANGUAGE_NONE][0]['value'] = $telefono;
+
+        $node_clasi->field_celular_clasificado[LANGUAGE_NONE][0]['value'] = $celular;
+
+        $node_clasi->field_fax_clasificado[LANGUAGE_NONE][0]['value'] = $fax;
+
+        $node_clasi->field_correo_electronico_clasifi[LANGUAGE_NONE][0]['value'] = $correo;
+
+        $node_clasi->field_url_clasificado[LANGUAGE_NONE][0]['value'] = $url;
+
+        //fechas inicios y fin eventos
+        if(isset($fecha_inicio) && !empty($fecha_inicio)){
+          $tmpfecha = explode(" ", $fecha_inicio);
+          $tmpfecha2 = explode("/", $tmpfecha[0]);
+          $fecha_inicio = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . " 00:00:00";
+        }
+
+        if(isset($fecha_fin) && !empty($fecha_fin)){
+          $tmpfecha = explode(" ", $fecha_fin);
+          $tmpfecha2 = explode("/", $tmpfecha[0]);
+          $fecha_fin = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . " 00:00:00";
+        }
+
+        $node_clasi->publish_on = strtotime($fecha_inicio);
+
+        if ($tid_estado_clasificado == 31){ 
+          if (strtotime($fecha_fin) > time()){ 
+            $node_clasi->unpublish_on = strtotime($fecha_fin);
+          }  
+        }
+
+        //almacenar fecha de despublicacion en otro campo
+        $node_clasi->field_fecha_despublicacion[LANGUAGE_NONE][0]['value'] = strtotime($fecha_fin);
+        $node_clasi->field_fecha_publicacion[LANGUAGE_NONE][0]['value'] = strtotime($fecha_inicio);
+
+        drupal_set_message(t("Updating node @node clasificado With External id @external", array("@node" => $node_clasi->nid, "@external" => $id)), "status");
+
+        node_save($node_clasi);
+
+        $transition = new WorkflowTransition();
+        $entity_type = 'node';
+        $field_name = 'field_estado_clasificado';
+        $old_sid = 30; // sid of your Draft status
+        $new_sid = $tid_estado_clasificado; // sid of your Saved status
+        $uid = 1; // You can change with uid of author.
+        $stamp = REQUEST_TIME;
+        $comment = 'Cambio estado clasificado';
+        $transition->setValues($entity_type, $node_clasi, $field_name, $old_sid, $new_sid, $uid, $stamp, $comment);
+        workflow_execute_transition($entity_type, $node_clasi, $field_name, $transition, $force = TRUE); */
+
+        //actualizar imagenes
+        //abrir archivo donde deberian estar los paths y alt text y demas
+        $file_imagenes = fopen($path_imagenes, 'r');
+
+        while (($line_imagenes = fgetcsv($file_imagenes)) !== FALSE) {
+          $id_imagen = $line_imagenes[0];
+
+          if ($id_imagen == $anexo){
+            dpm("Se encontro foto en el excel");
+            $nombre_imagen = $line_imagenes[1];
+            $alt = $node_clasi->title;
+            $title = $node_clasi->title;
+
+            $timestamp = time();
+
+            $path_imagen2 = "public://imagenes/" . $nombre_imagen;
+
+            $path_imagen_remoto = "http://www.artesaniasdecolombia.com.co/Documentos/Clasificado/" . $nombre_imagen;
+
+            $file_temp = file_get_contents($path_imagen_remoto);
+
+            if ($file_temp){
+                drupal_set_message(t("-----SI SE encontro en artesaniasdecolombia.com.co: @imagen", array("@imagen" => $path_imagen_remoto)), "status");
+                $pos = 0;
+
+                // Saves a file to the specified destination and creates a database entry.
+                $file_temp = file_save_data($file_temp, $path_imagen2, FILE_EXISTS_RENAME);
+
+                file_usage_add($file_temp, 'adc_migration', 'node', $file_temp->fid);
+
+                $node_clasi->field_imagenes = array(
+                  LANGUAGE_NONE => array(
+                      $pos => array(
+                        'fid' => $file_temp->fid,
+                        'filename' => $file_temp->filename,
+                        'filemime' => $file_temp->filemime,
+                        'uid' => 1,
+                        'uri' => $file_temp->uri,
+                        'status' => 1,
+                        'display' => 1
+                      )
+                    )
+                  );
+                 
+                  $node_clasi->field_imagenes[LANGUAGE_NONE][$pos]['alt'] = $alt;
+                  $node_clasi->field_imagenes[LANGUAGE_NONE][$pos]['title'] = $title;
+
+                  drupal_set_message(t("Imagen creada: @imagen", array("@imagen" => $file_temp->uri)), "status");
+
+                  image_path_flush($node_clasi->field_imagenes[LANGUAGE_NONE][$pos]['uri']);
+
+                  $pos++;
+              } else {
+                drupal_set_message(t("La siguiente imagen no se encontro en artesaniasdecolombia.com.co O HAY UN DELAY: @imagen", array("@imagen" => $path_imagen_remoto)), "status");
+              }
+
+              break;
+          }
+        }
+
+        fclose($file_imagenes);
+
+        node_save($node_clasi);
+
+        //actualizar directamente en la BD las fechas de creacion y actualizacion
+        $timestamp_creation = strtotime($fecha_creacion);
+        $timestamp_modification = strtotime($fecha_modificacion);
+
+        if (!($timestamp_creation > 0)){
+          $timestamp_creation = time();
+        }
+
+        if (!($timestamp_modification > 0)){
+          $timestamp_modification = time();
+        }
+
+        //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+        $updated = db_update('node')
+          ->fields(array(
+            'created' => $timestamp_creation,
+            'changed' => $timestamp_modification,
+            'status' => $estado_publicacion,
+          ))
+          ->condition('nid', $result2['entity_id'], '=')
+          ->execute();
+
+        if ($updated < 1){
+          drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $result2['entity_id'])), "status");
+        }
+
+        $arreglo_updated[] = $node_clasi->nid;
+        $index_updated++;
+        $last_record = $id;
+
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record));  
+      } else {
+        //si no existe, intentar crearlo
+        $tipo_clasificado = $line[2];
+        $titulo_clasificado = $line[3];
+        $descripcion = $line[4];
+        $direccion = $line[11];
+        $telefono = $line[12];
+        $celular = $line[13];
+        $fax = $line[14];
+        $correo = $line[15];
+        $url = $line[16];
+        $fecha_inicio = $line[17];
+        $fecha_fin = $line[18];
+        $estado_clasificado = $line[20];
+        $estado_publicacion = $line[22];
+        $id_usuario_creacion = $line[23];
+        $fecha_creacion = $line[24];
+        $fecha_modificacion = $line[26];
+
+        //crear una entidad y guardar la info
+        $node = entity_create('node', array('type' => 'clasificado'));
+
+        //mapear id usuario creacion con uid
+        $uid_real = get_uid_usuario($id_usuario_creacion);
+
+        $node->uid = $uid_real;
+
+        $clasificado_wrap = entity_metadata_wrapper('node', $node);
+
+        $tid_tipo_clasificado = get_categoria_clasificado($tipo_clasificado);
+
+        if (!$tid_tipo_clasificado){
+          $tid_tipo_clasificado = get_categoria_clasificado(1);
+        }
+
+        $tid_estado_clasificado = get_estado_de_publicacion_clasificado($estado_clasificado);
+
+        if (!$tid_estado_clasificado){
+          $tid_estado_clasificado = get_estado_de_publicacion_clasificado('N');
+        }
+
+        if ($estado_publicacion == 'A' || $estado_publicacion == 'V'){
+          $estado_publicacion = 1;
+        } else {
+          $estado_publicacion = 0;
+        }
+
+        $clasificado_wrap->title->set($titulo_clasificado);
+        $clasificado_wrap->body->set(array('value' => $descripcion));
+        $clasificado_wrap->field_id_clasificado = $id;
+        $clasificado_wrap->field_tipo_clasificado = $tid_tipo_clasificado;
+        $clasificado_wrap->field_estado_clasificado = $tid_estado_clasificado;
+        $clasificado_wrap->status = $estado_publicacion;
+        $clasificado_wrap->field_direccion_clasificado = $direccion;
+        $clasificado_wrap->field_telefono_clasificado = $telefono;
+        $clasificado_wrap->field_celular_clasificado = $celular;
+        $clasificado_wrap->field_fax_clasificado = $fax;
+        $clasificado_wrap->field_correo_electronico_clasifi = $correo;
+        $clasificado_wrap->field_url_clasificado = $url;
+
+        drupal_set_message(t("Creating node clasificado With External id @external", array("@external" => $id)), "status");
+
+        $res = $clasificado_wrap->save();
+        $nuevonodo = $res->raw();
+
+        if ($nuevonodo->nid){
+
+          $node_clasi = node_load($nuevonodo->nid);
+
+          //fechas inicios y fin eventos
+          if(isset($fecha_inicio) && !empty($fecha_inicio)){
+            $tmpfecha = explode(" ", $fecha_inicio);
+            $tmpfecha2 = explode("/", $tmpfecha[0]);
+            $fecha_inicio = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . " 00:00:00";
+          }
+
+          if(isset($fecha_fin) && !empty($fecha_fin)){
+            $tmpfecha = explode(" ", $fecha_fin);
+            $tmpfecha2 = explode("/", $tmpfecha[0]);
+            $fecha_fin = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . " 00:00:00";
+          }
+
+          $node_clasi->publish_on = strtotime($fecha_inicio);
+
+          if ($tid_estado_clasificado == 31){ 
+            if (strtotime($fecha_fin) > time()){ 
+              $node_clasi->unpublish_on = strtotime($fecha_fin);
+            }  
+          }
+
+          //almacenar fecha de despublicacion en otro campo
+          $node_clasi->field_fecha_despublicacion[LANGUAGE_NONE][0]['value'] = strtotime($fecha_fin);
+          $node_clasi->field_fecha_publicacion[LANGUAGE_NONE][0]['value'] = strtotime($fecha_inicio);
+
+          node_save($node_clasi);
+
+          unset($node_clasi);
+
+          //actualizar directamente en la BD las fechas de creacion y actualizacion
+          $timestamp_creation = strtotime($fecha_creacion);
+          $timestamp_modification = strtotime($fecha_modificacion);
+
+          if (!($timestamp_creation > 0)){
+            $timestamp_creation = time();
+          }
+
+          if (!($timestamp_modification > 0)){
+            $timestamp_modification = time();
+          }
+
+          //poner la fecha real de creacion y modificacion
+          //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+          $nuevonid = $nuevonodo->nid;
+
+          //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+          $updated = db_update('node')
+            ->fields(array(
+              'created' => $timestamp_creation,
+              'changed' => $timestamp_modification,
+              'status' => $estado_publicacion,
+            ))
+            ->condition('nid', $nuevonid, '=')
+            ->execute();
+
+          if ($updated < 1){
+            drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $nuevonid)), "status");
+          }
+
+          $arreglo_updated[] = $nuevonodo->nid;
+          $index_updated++;
+          $last_record = $id;
+        } else {
+          $arreglo_notupdated[] = $id;
+          $index_not_updated++;  
+        }      
+      }
+
+    }
+
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_migrate_informacion_contactenos(){
+  //path to migration file
+  $timestamp = time();
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/migration-contactenos.csv';
+  $updated_nodes = "/tmp/updated-" . $timestamp . ".json";
+  $notupdated_nodes = "/tmp/notupdated-" . $timestamp . ".json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+
+    $id = $line[0];
+
+    if($line[0]){
+
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "id_contactenos"){
+        continue;
+      }
+
+      //mirar si existe el registro
+      $result = db_query("SELECT entity_id FROM field_data_field_radicado WHERE bundle = 'contactenos' AND field_radicado_value = :id_contactenos LIMIT 1", array(":id_contactenos" => $id))->fetchAssoc();
+
+      if (!empty($result['entity_id'])){
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record));
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;   
+      } else {
+        dpm($line);
+        //leer la informacion del cvs
+        $tipo_contacto = $line[1];
+        $nombre_contacto = $line[3];
+        $apellido_contacto = $line[4];
+        $correo_contacto = $line[5];
+        $telefono = $line[6];
+        $codigo_pais = $line[7];
+        $codigo_departamento = $line[8];
+        $codigo_ciudad = $line[9];
+        $direccion = $line[10];
+        $comentario = $line[11];
+        $respuesta = $line[12];
+        $estado = $line[13];
+        $usuario_creacion = $line[15];
+        $fecha_creacion = $line[16];
+        $usuario_modificacion = $line[17];
+        $fecha_modificacion = $line[18];
+        $fecha_limite = $line[20];
+
+        //hacer el mapeo a tids necesarios y otros ajustes
+        $tid_pais = "";
+        $tid_departamento = "";
+        $tid_ciudad = "";
+
+        //informacion de la ubicacion
+        if(isset($codigo_pais) && !empty($codigo_pais)){
+          $tid_pais = get_tid_by_codigo_pais($codigo_pais);
+        }
+
+        if (!empty($tid_pais) && $tid_pais == 196 && isset($codigo_departamento) && !empty($codigo_departamento)){
+          //$id_depa_formatted = (float) ($codigo_departamento / 1000);
+          $tid_departamento = get_tid_by_codigo_departamento($codigo_departamento);
+        }
+
+        if (!empty($tid_pais) && $tid_pais == 196 && !empty($tid_departamento) && isset($codigo_ciudad) && !empty($codigo_ciudad)){
+          //$id_ciudad_formatted = number_format($codigo_ciudad, 0, ".", ".");
+          $tid_ciudad = get_tid_by_codigo_ciudad($codigo_ciudad);
+        }
+
+        //estado workflow
+        $tid_estado_contactenos = get_estado_publicacion_contactenos($estado);
+
+        //tipo de contacto
+        $tid_tipo_contacto = get_tid_tipo_contactenos($tipo_contacto);
+
+        if (empty($tid_tipo_contacto) || !isset($tid_tipo_contacto)){
+           $tid_tipo_contacto = get_tid_tipo_contactenos('11');
+        }
+
+        //fechas
+        $tmp = explode("/", $fecha_creacion);
+        $nuevafecha = $tmp[0] . "/" . $tmp[1] . "/" . $tmp[2]; 
+        $timestamp_creation = strtotime($nuevafecha);
+
+        $tmp = explode("/", $fecha_modificacion);
+        $nuevafecha = $tmp[0] . "/" . $tmp[1] . "/" . $tmp[2]; 
+        $timestamp_modification = strtotime($nuevafecha);
+
+        $tmp2 = explode(" ", $fecha_limite);
+        $tmp = explode("/", $tmp2[0]);
+        dpm($tmp);
+        $fecha_limite = $tmp[2] . "-" . $tmp[0] . "-" . $tmp[1] . " 05:00:00";
+
+        if (!($timestamp_creation > 0)){
+          $timestamp_creation = time();
+        }
+
+        if (!($timestamp_modification > 0)){
+          $timestamp_modification = time();
+        }
+
+        //crear una entidad y guardar la info
+        $node = entity_create('node', array('type' => 'contactenos'));
+
+        $node->uid = 1;
+
+        $contact_wrap = entity_metadata_wrapper('node', $node);
+
+        $contact_wrap->title->set("Contacto " . $id);
+        $contact_wrap->body->set(array('value' => $comentario));
+        $contact_wrap->field_tema = $tid_tipo_contacto;
+        $contact_wrap->status = 1;
+        $contact_wrap->field_nombres = $nombre_contacto;
+        $contact_wrap->field_apellidos = $apellido_contacto;
+        $contact_wrap->field_respuesta_contacto = $respuesta;
+        $contact_wrap->field_correo_electronico = $correo_contacto;
+        $contact_wrap->field_num_telefono = $telefono;
+        $contact_wrap->field_direccion = $direccion;
+        $contact_wrap->field_radicado = $id;
+        $contact_wrap->field_estado_contacto = $tid_estado_contactenos;
+
+        if (empty($tid_pais)){
+            $tid_pais = 196;
+        }
+
+        if (!empty($tid_ciudad) && isset($tid_ciudad)){
+            $contact_wrap->field_pais = $tid_ciudad;
+          } else { 
+            //solo hay informacion de pais
+            if (!empty($tid_departamento) && isset($tid_departamento)){
+              $contact_wrap->field_pais = $tid_departamento;
+            } else { 
+              $contact_wrap->field_pais = $tid_pais;
+            }
+        }
+
+        drupal_set_message(t("Creating node contactenos With External id @external", array("@external" => $id)), "status");
+
+        $res = $contact_wrap->save();
+        $nuevonodo = $res->raw();
+
+        if ($nuevonodo->nid){
+          //cambiar fecha limite
+          $nodo_contact = node_load($nuevonodo->nid);
+
+          $nodo_contact->field_fecha_limite_res[LANGUAGE_NONE][0]['value'] = $fecha_limite;
+          $nodo_contact->field_fecha_limite_res[LANGUAGE_NONE][0]['timezone'] = "America/Bogota";
+          $nodo_contact->field_fecha_limite_res[LANGUAGE_NONE][0]['timezone_db'] = "UTC";
+          $nodo_contact->field_fecha_limite_res[LANGUAGE_NONE][0]['date_type'] = "datetime";
+
+          node_save($nodo_contact);
+
+          unset($nodo_contact);
+
+          //actualizar fechas
+          $nuevonid = $nuevonodo->nid;
+
+          $updated = db_update('node')
+            ->fields(array(
+              'created' => $timestamp_creation,
+              'changed' => $timestamp_modification,
+            ))
+            ->condition('nid', $nuevonid, '=')
+            ->execute();
+
+          if ($updated < 1){
+            drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $result2['entity_id'])), "status");
+          }
+
+          $arreglo_updated[] = $nuevonodo->nid;
+          $index_updated++;
+          $last_record = $id;
+
+          file_put_contents("/tmp/lastrecord.json", json_encode($last_record));  
+        } else {
+          $arreglo_notupdated[] = $id;
+          $index_not_updated++;           
+        } 
+      }
+
+    }
+  }
+
+  drupal_set_message(t("Records created: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not created: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record created: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Creating Contents'); 
+}
+
+function _adc_migration_update_supervisores_contratos(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/updates-supervisores.csv';
+  $path_archivo_supervisores = DRUPAL_ROOT . '/sites/default/files/migration/perfiles-supervisores.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+
+    //id contrato
+    $id = $line[0];
+
+    if($line[0]){
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+      $raw_id = $line[0];
+      $num_interno = $line[1];
+
+      $result = db_query("SELECT entity_id FROM field_data_field_id_de_contrato WHERE field_id_de_contrato_value = :contenido_id LIMIT 1", array(":contenido_id" => $id))->fetchAssoc();
+
+      $result_tmp = db_query("SELECT entity_id FROM field_data_field_id_de_contrato WHERE field_id_de_contrato_value = :contenido_id LIMIT 1", array(":contenido_id" => $raw_id))->fetchAssoc();
+
+      $result_title = db_query("SELECT nid FROM node WHERE title = :num_interno LIMIT 1", array(":num_interno" => $num_interno))->fetchAssoc();
+
+      //realizar las actualizaciones necesarias a nivel de db
+      if (!empty($result['entity_id']) || !empty($result_tmp['entity_id']) || !empty($result_title['nid'])){
+        //numero interno contrato para consultar la tabla de supervisores
+
+        //Puede que el id este almacenado con la coma en la BD
+        if (!empty($result_tmp['entity_id']) && empty($result['entity_id'])){
+          $result['entity_id'] = $result_tmp['entity_id'];
+          dpm("El ID de contrato registrado en la BD TENIA COMA O PUNTO");
+          drupal_set_message(t("Ya existia el siguiente id @external", array("@external" => $raw_id)), "status");
+        }
+
+        //Puede que el id no este almacenado, pero ya esta x el titulo
+        if (!empty($result_title['nid']) && empty($result_tmp['entity_id']) && empty($result['entity_id']) ){
+          $result['entity_id'] = $result_title['nid'];
+          dpm("El ID no estaba registrado, pero si el titulo");
+          drupal_set_message(t("NO existia el siguiente id @external", array("@external" => $id)), "status");
+        }
+
+        $num_interno = $line[1];
+        $fecha_inicio_contrato = $line[17];
+        $fecha_fin_contrato = $line[18];
+        $fecha_firma_contrato = $line[6];
+
+        $node_contrato = node_load($result['entity_id']);
+
+        $node_contrato->field_id_de_contrato[LANGUAGE_NONE][0]['value'] = $id;
+
+        node_save($node_contrato);
+
+        unset($node_contrato);
+
+        $file_supervisores = fopen($path_archivo_supervisores, 'r');
+
+        while (($line_supervisores = fgetcsv($file_supervisores)) !== FALSE) {
+          if ($line_supervisores[0]){
+
+            //mirar si el numero interno esta asociado a algun supervisor
+            if ($line_supervisores[0] == $num_interno){
+              //procesar cedula supervisor
+              $cedula_supervisor = $line_supervisores[3];
+              $cedula_supervisor = str_replace(".", "", $cedula_supervisor);
+              $cedula_supervisor = str_replace(",", "", $cedula_supervisor);
+
+              //consultar si esa cedula esta en la BD
+              $result2 = db_query("SELECT entity_id FROM field_data_field_num_documento WHERE  field_num_documento_value = :cedula_super LIMIT 1", array(":cedula_super" => $cedula_supervisor))->fetchAssoc();
+
+              if (!empty($result2['entity_id'])){
+                $node_contrato = node_load($result['entity_id']);
+
+                //actualizar usuario dependencia y usuario supervisor
+                $node_contrato->field_usuario_dependencia[LANGUAGE_NONE][0]['target_id'] = $result2['entity_id'];
+                $node_contrato->field_usuario_supervisor[LANGUAGE_NONE][0]['value'] = $result2['entity_id'];
+
+                //actualizar dependencia
+                $userobj = user_load($result2['entity_id']);
+
+                $entidad_dependencia = $userobj->field_dependencia[LANGUAGE_NONE][0]['tid'];
+
+                if ($entidad_dependencia){ 
+                  $node_contrato->field_dependencia[LANGUAGE_NONE][0]['tid'] = $entidad_dependencia;
+                }
+
+                //actualizar fecha inicio y fecha fin contrato
+                $tmpfecha = explode("/", $fecha_inicio_contrato);
+
+                if ($tmpfecha[1] < 10){
+                  $tmpfecha[1] = "0" . $tmpfecha[1];
+                }
+
+                if ($tmpfecha[0] < 10){
+                  $tmpfecha[0] = "0" . $tmpfecha[0];
+                }
+
+                $fecha1 = $tmpfecha[2] . "-" . $tmpfecha[0] . "-" . $tmpfecha[1] . "T00:00:00";
+
+                $tmpfecha = explode("/", $fecha_fin_contrato);
+
+                if ($tmpfecha[1] < 10){
+                  $tmpfecha[1] = "0" . $tmpfecha[1];
+                }
+
+                if ($tmpfecha[0] < 10){
+                  $tmpfecha[0] = "0" . $tmpfecha[0];
+                }
+
+                $fecha2 = $tmpfecha[2] . "-" . $tmpfecha[0] . "-" . $tmpfecha[1] . "T00:00:00";
+
+                $tmpfecha = explode("/", $fecha_firma_contrato);
+
+                if ($tmpfecha[1] < 10){
+                  $tmpfecha[1] = "0" . $tmpfecha[1];
+                }
+
+                if ($tmpfecha[0] < 10){
+                  $tmpfecha[0] = "0" . $tmpfecha[0];
+                }
+
+                $fecha_firma = $tmpfecha[0] . "/" . $tmpfecha[1] . "/" . $tmpfecha[2];
+
+                $node_contrato->field_fecha_ejec_contrato[LANGUAGE_NONE][0]['value'] = $fecha1;
+                $node_contrato->field_fecha_ejec_contrato[LANGUAGE_NONE][0]['value2'] = $fecha2;
+                $node_contrato->timezone = "America/Bogota";
+                $node_contrato->timezone_db = "America/Bogota";
+
+                $node_contrato->field_fecha_firma_contrato[LANGUAGE_NONE][0]['value'] = strtotime($fecha_firma);
+
+                drupal_set_message(t("Update node Contratos With External id @external", array("@external" => $id)), "status");
+
+                node_save($node_contrato);
+
+                unset($node_contrato);
+
+                unset($userobj);
+
+                //restaurar fecha changed
+                $fecha_mod = strtotime($line[34]);
+
+                $updated = db_update('node')
+                  ->fields(array(
+                    'changed' => $fecha_mod,
+                  ))
+                  ->condition('nid', $result['entity_id'], '=')
+                  ->execute();
+
+              } else {
+                //usar el usuario administrador contratos
+                $node_contrato = node_load($result['entity_id']);
+
+                //actualizar usuario dependencia y usuario supervisor
+                $node_contrato->field_usuario_dependencia[LANGUAGE_NONE][0]['target_id'] = 46;
+                $node_contrato->field_usuario_supervisor[LANGUAGE_NONE][0]['value'] = 46;
+
+                //actualizar dependencia
+                $node_contrato->field_dependencia[LANGUAGE_NONE][0]['tid'] = 1870;
+
+                //actualizar fecha inicio y fecha fin contrato
+                $tmpfecha = explode("/", $fecha_inicio_contrato);
+                $fecha1 = $tmpfecha[2] . "-" . $tmpfecha[1] . "-" . $tmpfecha[0] . "T00:00:00";
+
+                $tmpfecha = explode("/", $fecha_fin_contrato);
+                $fecha2 = $tmpfecha[2] . "-" . $tmpfecha[1] . "-" . $tmpfecha[0] . "T00:00:00";
+
+                $tmpfecha = explode("/", $fecha_firma_contrato);
+
+                if ($tmpfecha[1] < 10){
+                  $tmpfecha[1] = "0" . $tmpfecha[1];
+                }
+
+                if ($tmpfecha[0] < 10){
+                  $tmpfecha[0] = "0" . $tmpfecha[0];
+                }
+
+                $fecha_firma = $tmpfecha[0] . "/" . $tmpfecha[1] . "/" . $tmpfecha[2];
+
+                //actualizar fecha inicio y fecha fin contrato
+                $node_contrato->field_fecha_ejec_contrato[LANGUAGE_NONE][0]['value'] = $fecha1;
+                $node_contrato->field_fecha_ejec_contrato[LANGUAGE_NONE][0]['value2'] = $fecha2;
+                $node_contrato->timezone = "America/Bogota";
+                $node_contrato->timezone_db = "America/Bogota";
+
+                $node_contrato->field_fecha_firma_contrato[LANGUAGE_NONE][0]['value'] = strtotime($fecha_firma);
+
+                drupal_set_message(t("Update node Contratos With External id @external", array("@external" => $id)), "status");
+
+                node_save($node_contrato);
+
+                unset($node_contrato);
+                unset($userobj);
+
+                //restaurar fecha changed
+                $fecha_mod = strtotime($line[34]);
+
+                $updated = db_update('node')
+                  ->fields(array(
+                    'changed' => $fecha_mod,
+                  ))
+                  ->condition('nid', $result['entity_id'], '=')
+                  ->execute();             
+              }
+            }        
+          }
+        }
+
+        fclose($file_supervisores);
+
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record));  
+
+        $arreglo_updated[] = $result['entity_id'];
+        $index_updated++;
+        $last_record = $id;   
+
+      } else {
+        //intentar crear el contrato
+        /* $num_interno = $line[1];
+        $tipo_contrato = $line[2];
+        $tipo_proceso = $line[4];
+        $fecha_firma_contrato = $line[6];
+        $valor_contrato = $line[16];
+        $fecha_inicio_contrato = $line[17];
+        $fecha_fin_contrato = $line[18];
+        $descripcion_contrato = $line[19];
+        $nombre_contratante = $line[20];
+        $tipo_id_contratante = $line[21];
+        $num_id_contratante = $line[22];
+        $nombre_contratista = $line[23];
+        $tipo_id_contratista = $line[24];
+        $numero_id_contratista = $line[25];
+        $id_anexo = $line[27];
+        $nombre_anexo_pdf = $line[28];
+        $estado_contrato = $line[30];
+        $id_usuario_creacion = $line[31];
+        $fecha_creacion = $line[32];
+        $fecha_modificacion = $line[34];
+        $id_hoja_vida = $line[35];
+
+        //mapeos varios
+        $uid_real = get_uid($id_usuario_creacion);
+
+        //crear una entidad y guardar la info
+        $node = entity_create('node', array('type' => 'contrato'));
+
+        $node->uid = $uid_real;
+
+        $contrato_wrap = entity_metadata_wrapper('node', $node);
+
+        $contrato_wrap->title->set($num_interno);
+        $contrato_wrap->body->set(array('value' => $comentario));
+
+        drupal_set_message(t("Creating node contrato With External id @external", array("@external" => $id)), "status");
+
+        $res = $contrato_wrap->save();
+
+        $nuevonodo = $res->raw();
+
+        if ($nuevonodo->nid){
+          $node_contrato = node_load($nuevonodo->nid);
+
+          node_save($node_contrato);
+
+         //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+          $nuevonid = $nuevonodo->nid;
+
+          $updated = db_update('node')
+            ->fields(array(
+              'created' => $fecha_creacion,
+              'changed' => $fecha_modificacion,
+            ))
+            ->condition('nid', $nuevonid, '=')
+            ->execute();
+
+          if ($updated < 1){
+            drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $nuevonid)), "status");
+          }
+
+          $arreglo_updated[] = $nuevonodo->nid;
+          $index_updated++;
+          $last_record = $id;
+
+          file_put_contents("/tmp/lastrecord.json", json_encode($last_record));
+        } else { 
+        } */
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;     
+      }
+    }
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Creating Contents');
+}
+
+function _adc_migration_migrate_eventos(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/migration-eventos.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json"; 
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+
+    $id = $line[0];
+
+    if($line[0]){
+
+      if ($id == "id_evento"){
+        continue;
+      }
+
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      //mirar si el evento existe, de lo contrario actualizarlo (en este caso actualizar estado y status only)
+      $result = db_query("SELECT entity_id FROM field_data_field_id_anterior WHERE bundle = 'evento' AND field_id_anterior_value = :contenido_id LIMIT 1", array(":contenido_id" => $id))->fetchAssoc();
+
+      if (!empty($result['entity_id'])){
+        $fecha_inicio_evento = $line[13];
+        $fecha_final_evento = $line[14];
+        $estado_workflow = $line[23];
+        $estado = $line[25];
+        $id_usuario_creacion = $line[26];
+        $fecha_creacion = $line[27];
+        $fecha_modificacion = $line[29];
+
+        //gestionar mapeos de estados y workflow
+        if(isset($estado) && !empty($estado)){
+          $estado = strtoupper($estado);
+          if(($estado == 'A') || ($estado == 'V')){
+            $estado = 1;
+          } else {
+            $estado = 0;
+          }
+        }
+
+        //cargar node y guardar la info necesaria
+        $node_eventos = node_load($result['entity_id']);
+
+        $node_eventos->status = $estado;
+
+        $node_eventos->field_estado_evento[LANGUAGE_NONE][0]['value'] = get_estado_publicacion_eventos($estado_workflow);
+
+        // Fecha de Creación
+        if(!empty($fecha_creacion) && ($fecha_creacion != '#N/A')){
+          $create_date = $fecha_creacion;
+          $fecha_creacion = strtotime($create_date);
+        } else{
+          $fecha_creacion = time();
+        }
+
+        // Fecha de Modificación
+        if(!empty($fecha_modificacion) && ($fecha_modificacion != '#N/A')){
+          $edit_date = $fecha_modificacion;
+          $fecha_modificacion = strtotime($edit_date);
+        }else{
+          $fecha_modificacion = time();
+        }
+
+        drupal_set_message(t("Updating node eventos With External id @external", array("@external" => $id)), "status");
+
+        node_save($node_eventos);
+
+        //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+        $nuevonid = $node_eventos->nid;
+
+        $updated = db_update('node')
+          ->fields(array(
+              'created' => $fecha_creacion,
+              'changed' => $fecha_modificacion,
+          ))
+          ->condition('nid', $nuevonid, '=')
+          ->execute();
+
+        if ($updated < 1){
+          drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $nuevonid)), "status");
+        }
+
+        $arreglo_updated[] = $nuevonid;
+        $index_updated++;
+        $last_record = $id;
+
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record));  
+      } else {
+        //creando evento
+
+        $categoria = $line[2];
+        $tipo_evento = $line[4];
+        $nombre_evento = $line[6];
+        $descripcion = $line[8];
+        $codigo_pais = $line[9];
+        $codigo_departamento = $line[10];
+        $codigo_ciudad = $line[11];
+        $direccion = $line[12];
+        $fecha_inicio_evento = $line[13];
+        $fecha_final_evento = $line[14];
+        $telefono = $line[15];
+        $celular = $line[17];
+        $fax = $line[18];
+        $correo_contacto = $line[19];
+        $url = $line[20];
+        $estado_workflow = $line[23];
+        $estado = $line[25];
+        $id_usuario_creacion = $line[26];
+        $fecha_creacion = $line[27];
+        $fecha_modificacion = $line[29];
+
+        //validaciones, mapeos y demas
+        if(!valid_email_address($correo_contacto)){
+          $correo_contacto = "soporte@esinergia.co";
+        }
+
+        if(isset($estado) && !empty($estado)){
+          $estado = strtoupper($estado);
+          if(($estado == 'A') || ($estado == 'V')){
+            $estado = 1;
+          }else{
+            $estado = 0;
+          }
+        }
+
+        //Mapear categoria evento
+        if(isset($categoria) && !empty($categoria)){
+          $categoria = get_categoria_evento($categoria);
+        }
+
+        // Fecha de Creación
+        if(!empty($fecha_creacion) && ($fecha_creacion != '#N/A')){
+          $create_date = $fecha_creacion;
+          $fecha_creacion = strtotime($create_date);
+        } else{
+          $fecha_creacion = time();
+        }
+
+        // Fecha de Modificación
+        if(!empty($fecha_modificacion) && ($fecha_modificacion != '#N/A')){
+          $edit_date = $fecha_modificacion;
+          $fecha_modificacion = strtotime($edit_date);
+        }else{
+          $fecha_modificacion = time();
+        }
+
+        //Mapear Id del usuario (portal viejo) a UID usuario
+        $id_usuario_creacion = get_uid_usuario($id_usuario_creacion);
+
+        //fechas inicios y fin eventos
+        if(isset($fecha_inicio_evento) && !empty($fecha_inicio_evento)){
+          $tmpfecha = explode(" ", $fecha_inicio_evento);
+          $tmpfecha2 = explode("/", $tmpfecha[0]);
+          $fecha_inicio_evento = $tmpfecha2[2] . "-" . $tmpfecha2[0] . "-" . $tmpfecha2[1] . "T19:00:00";
+        }
+
+        if(isset($fecha_final_evento) && !empty($fecha_final_evento)){
+          $tmpfecha = explode(" ", $fecha_final_evento);
+          $tmpfecha2 = explode("/", $tmpfecha[0]);
+          $fecha_final_evento = $tmpfecha2[2] . "-" . $tmpfecha2[0] . "-" . $tmpfecha2[1] . "T19:00:00";
+        }
+
+        //pais, depto y ciudad si existen
+        if(isset($codigo_pais) && !empty($codigo_pais)){
+          $tid_pais = get_tid_by_codigo_pais($codigo_pais);
+          if (!$tid_pais){
+            $tid_pais = 196;
+          }
+        }
+
+        if(!empty($tid_pais) && $tid_pais == '196' && isset($codigo_departamento) && !empty($codigo_departamento)){
+          $tid_depa = get_tid_by_codigo_departamento($codigo_departamento);
+        }
+
+        if(!empty($tid_pais) && $tid_pais == '196' && !empty($tid_depa) && isset($codigo_ciudad) && !empty($codigo_ciudad)){
+          $tid_ciudad = get_tid_by_codigo_ciudad($codigo_ciudad);
+        }
+
+        //validacion campo direccion
+        if (strlen($direccion) >= 255){
+          $direccion = "";
+        }
+
+        //crear una entidad y guardar la info
+        $node = entity_create('node', array('type' => 'evento'));
+
+        $node->uid = 1;
+
+        $evento_wrap = entity_metadata_wrapper('node', $node);
+
+        $evento_wrap->title->set($nombre_evento);
+        $evento_wrap->body->set(array('value' => $descripcion));
+        $evento_wrap->field_direccion = $direccion;
+        $evento_wrap->field_num_celular = $celular;
+        $evento_wrap->field_correo_electronico = $correo_contacto;
+        $evento_wrap->field_tipo_evento = $tipo_evento;
+        $evento_wrap->field_id_anterior = $id;
+        $evento_wrap->field_num_telefono = $telefono;;
+        $evento_wrap->status = $estado;
+        $evento_wrap->field_pagina_web = $url;
+
+        drupal_set_message(t("Creating node eventos With External id @external", array("@external" => $id)), "status");
+
+        $res = $evento_wrap->save();
+        $nuevonodo = $res->raw();
+
+        if ($nuevonodo->nid){
+          $node_evento = node_load($nuevonodo->nid);
+
+          $node_evento->field_categoria_evento[LANGUAGE_NONE][0]['tid'] = $categoria;
+
+          if(!empty($tid_pais)){
+            $node_evento->field_ubicacion_desplegable[LANGUAGE_NONE][0]['tid'] = $tid_pais;
+          }
+
+          if(!empty($tid_depa)){
+            $node_evento->field_ubicacion_desplegable[LANGUAGE_NONE][1]['tid'] = $tid_depa;
+          }
+
+          if(!empty($tid_ciudad)){
+            $node_evento->field_ubicacion_desplegable[LANGUAGE_NONE][2]['tid'] = $tid_ciudad;
+          }
+
+          $node_evento->field_fecha_de_evento[LANGUAGE_NONE][0]['value'] = $fecha_inicio_evento;
+          $node_evento->field_fecha_de_evento[LANGUAGE_NONE][0]['value2'] = $fecha_final_evento;
+          $node_evento->field_fecha_de_evento[LANGUAGE_NONE][0]['timezone'] = "America/Bogota";
+          $node_evento->field_fecha_de_evento[LANGUAGE_NONE][0]['timezone_db'] = "UTC";
+          $node_evento->field_estado_evento[LANGUAGE_NONE][0]['value'] = get_estado_publicacion_eventos($estado_workflow);
+
+          $node_evento->uid = $id_usuario_creacion;
+
+          node_save($node_evento);
+
+          unset($node_evento);
+
+          //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+          $nuevonid = $nuevonodo->nid;
+
+          $updated = db_update('node')
+            ->fields(array(
+              'created' => $fecha_creacion,
+              'changed' => $fecha_modificacion,
+            ))
+            ->condition('nid', $nuevonid, '=')
+            ->execute();
+
+          if ($updated < 1){
+            drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $nuevonid)), "status");
+          }
+
+          $arreglo_updated[] = $nuevonodo->nid;
+          $index_updated++;
+          $last_record = $id;
+
+          file_put_contents("/tmp/lastrecord.json", json_encode($last_record));       
+        }
+      }
+
+    }
+
+  }
+
+  drupal_set_message(t("Records created or updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not created: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record created: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Creating Contents'); 
+}
+
+function _adc_migration_update_links_relacionados(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/migration-linksrel.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";  
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+
+   $id = $line[1];
+
+   if($line[1]){
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "Id de Contenido"){
+        continue;
+      }
+
+      $result = db_query("SELECT entity_id FROM field_data_field_contenido_id WHERE field_contenido_id_value = :contenido_id LIMIT 1", array(":contenido_id" => $id))->fetchAssoc();
+
+      if (!empty($result['entity_id'])){
+        $contenido = node_load($result['entity_id']);
+
+        $nombrelink = $line[2];
+        $url = $line[5];
+
+        if ($contenido->type == 'page'){
+
+          if (count($contenido->field_links_relacionados) >= 1){
+            $pos = count($contenido->field_links_relacionados[LANGUAGE_NONE]);
+          } else {
+            $pos = 0;
+          }
+
+          $contenido->field_links_relacionados[LANGUAGE_NONE][$pos]['url'] = $url;
+          $contenido->field_links_relacionados[LANGUAGE_NONE][$pos]['title'] = $nombrelink;
+        } else if ($contenido->type == 'article'){
+
+          if (count($contenido->field_enlaces_relacionados) >= 1){
+            $pos = count($contenido->field_enlaces_relacionados[LANGUAGE_NONE]);
+          } else {
+            $pos = 0;
+          }
+
+          $contenido->field_enlaces_relacionados[LANGUAGE_NONE][$pos]['url'] = $url;
+          $contenido->field_enlaces_relacionados[LANGUAGE_NONE][$pos]['title'] = $nombrelink;          
+        }
+
+        drupal_set_message(t("Updating node @node links relacionados With External id @external", array("@node" => $contenido->nid, "@external" => $id)), "status");
+
+        node_save($contenido);
+
+        unset($contenido);
+
+        $arreglo_updated[] = $result['entity_id'];
+        $index_updated++;
+        $last_record = $id;
+
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record));  
+      } else {
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;        
+      }
+
+   }
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated)); 
+
+  return t('Done Updating Contents');
+
+}
+
+function _get_format_date($date){
+      $fecha_hora  =  explode(" ", $date);
+      $fecha_array = explode("/",$fecha_hora[0]);
+      $fecha       = $fecha_array[2].'-'.$fecha_array[1].'-'.$fecha_array[0].' '.$fecha_hora[1];
+      return $fecha;
+
+}
+
+function _adc_migration_update_info_imagenes(){
+  //path to migration file
+  $path = DRUPAL_ROOT .'/sites/default/files/migration/imagenes-contenido.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+  $totales = "/tmp/totales.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+ 
+  while (($line = fgetcsv($file,0,'~')) !== FALSE) {
+   $id = $line[0];
+
+    if ($id == "id"){
+     continue;
+    }
+
+    $nombre_imagen = $line[1];
+    $titulo_alt    = $line[2];
+    $pie_de_foto   = $line[3];
+
+    // se busca el nodo con el id de contenido 
+      $result = db_query("SELECT entity_id FROM field_data_field_contenido_id WHERE field_contenido_id_value = :contenido_id LIMIT 1", array(":contenido_id" => $id))->fetchAssoc();
+
+      if (!empty($result['entity_id'])){
+         $contenido = node_load($result['entity_id']);
+         $or = db_or();
+         $or->condition('uri', 'public://imagenes/'.$nombre_imagen);
+         $or->condition('filename', $nombre_imagen);
+         $num_deleted = db_delete('file_managed')
+            ->condition($or)
+            ->execute();
+
+         $img = (object) array( 'uid' => 1, 
+                                'uri' => 'public://imagenes/'.$nombre_imagen, 
+                                'filemime' => file_get_mimetype('public://imagenes/'.$nombre_imagen), 
+                                'fid' => null,
+                                'status' => 1, );        
+         $data = file_save($img);
+         $contenido->field_image = array(LANGUAGE_NONE => array('0' => (array)$data));        
+         $contenido->field_image[LANGUAGE_NONE][0]['alt']                 = $titulo_alt;
+         $contenido->field_image[LANGUAGE_NONE][0]['title']               = $titulo_alt;
+         $contenido->field_image[LANGUAGE_NONE][0]['image_field_caption'] = array('value'=>$pie_de_foto,'format'=>'plain_text');
+
+         node_save($contenido);
+
+
+         $arreglo_updated[] = $result['entity_id'];
+         $index_updated++;
+         $last_record       = $id;
+
+      } else {
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;        
+      }
+      
+    file_put_contents($totales, json_encode(array('updated'=>$index_updated,'notupdated'=>$index_not_updated)));
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated)); 
+
+  return t('Done Updating Contents');
+}
+
+function _adc_migration_migrate_encuestas(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/migration-encuestas.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  $path_respuestas = DRUPAL_ROOT . "/sites/default/files/migration/respuestas-encuestas.csv"; 
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+
+    $id = $line[0];
+
+    if($line[0]){
+
+      if ($id == "id_encuesta"){
+        continue;
+      }
+
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      $pregunta = $line[2];
+      $estado_publicacion = $line[3];
+      $id_usuario_creacion = $line[4];
+      $fecha_creacion = $line[5];
+      $fecha_modificacion = $line[7];
+      $fecha_inicio = $line[8];
+      $fecha_fin = $line[9];
+
+      //mapeos y varios
+      if(isset($estado_publicacion) && !empty($estado_publicacion)){
+        $estado_publicacion = strtoupper($estado_publicacion);
+        if(($estado_publicacion == 'A') || ($estado_publicacion == 'V')){
+          $estado_publicacion = 1;
+        }else{
+          $estado_publicacion = 0;
+        }
+      }
+
+      $uid_real = get_uid_usuario($id_usuario_creacion);
+
+      //crear contenido
+      $node = entity_create('node', array('type' => 'poll'));
+
+      $node->uid = $uid_real;
+      $node->runtime = 0;
+      $node->active = 1;
+
+      $encuesta_wrap = entity_metadata_wrapper('node', $node);
+
+      $encuesta_wrap->title = $pregunta;
+      $encuesta_wrap->status = $estado_publicacion;
+      $encuesta_wrap->field_id_anterior_taller = $id;
+
+      drupal_set_message(t("Creating node encuesta With External id @external", array("@external" => $id)), "status");
+
+      $res = $encuesta_wrap->save();
+      $nuevonodo = $res->raw();
+
+      if ($nuevonodo->nid){
+          $node_encuesta = node_load($nuevonodo->nid);
+
+          $node_encuesta->field_fecha_publicacion[LANGUAGE_NONE][0]['value'] = strtotime($fecha_inicio);
+          $node_encuesta->field_fecha_despublicacion[LANGUAGE_NONE][0]['value'] = strtotime($fecha_fin);
+
+          //leer archivo preguntas encuesta
+          $file_respuesta = fopen($path_respuestas, 'r');
+
+          while (($line_respuesta = fgetcsv($file_respuesta)) !== FALSE) {
+            $id_encuesta = $line_respuesta[1];
+            $opcion_encuesta = $line_respuesta[2];
+
+            $id_encuesta = str_replace(".", "", $id_encuesta);
+            $id_encuesta = str_replace(",", "", $id_encuesta);
+
+            $id_encuesta = (int) $id_encuesta;
+
+            //se encontro las opciones de la pregunta, crear las preguntas
+            if ($id_encuesta == $id){
+              $node_encuesta->choice[] = array(
+                'chid' => 0,
+                'chtext' => $opcion_encuesta,
+                'chvotes' => 0,
+                'weight' => 0,
+              );
+
+              $node_encuesta->votes = array();
+            }
+          }
+
+          fclose($file_respuesta);
+
+          //fechas inicios y fin eventos
+          if(isset($fecha_inicio) && !empty($fecha_inicio)){
+            $tmpfecha = explode(" ", $fecha_inicio);
+            $tmpfecha2 = explode("/", $tmpfecha[0]);
+            $fecha_inicio = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . " 00:00:00";
+          }
+
+          if(isset($fecha_fin) && !empty($fecha_fin)){
+            $tmpfecha = explode(" ", $fecha_fin);
+            $tmpfecha2 = explode("/", $tmpfecha[0]);
+            $fecha_fin = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . " 00:00:00";
+          }
+
+          $node_encuesta->publish_on = strtotime($fecha_inicio);
+          $node_encuesta->unpublish_on = strtotime($fecha_fin);
+
+          if (count($node_encuesta->choice) == 0){
+            drupal_set_message(t("La siguiente encuesta no tiene respuestas: @node", array("@node" => $id)), "status");
+          }
+
+          node_save($node_encuesta);
+
+          unset($node_encuesta);
+
+          //actualizar directamente en la BD las fechas de creacion y actualizacion
+          $timestamp_creation = strtotime($fecha_creacion);
+          $timestamp_modification = strtotime($fecha_modificacion);
+
+          if (!($timestamp_creation > 0)){
+            $timestamp_creation = time();
+          }
+
+          if (!($timestamp_modification > 0)){
+            $timestamp_modification = time();
+          }
+
+          //poner la fecha real de creacion y modificacion
+          //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+          $nuevonid = $nuevonodo->nid;
+
+          //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+          $updated = db_update('node')
+            ->fields(array(
+              'created' => $timestamp_creation,
+              'changed' => $timestamp_modification,
+              'status' => $estado_publicacion,
+            ))
+            ->condition('nid', $nuevonid, '=')
+            ->execute();
+
+          if ($updated < 1){
+            drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $nuevonid)), "status");
+          }
+
+          $arreglo_updated[] = $nuevonodo->nid;
+          $index_updated++;
+          $last_record = $id;
+
+          file_put_contents("/tmp/lastrecord.json", json_encode($last_record)); 
+      } else {
+          $arreglo_notupdated[] = $id;
+          $index_not_updated++;  
+        }   
+
+    }    
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated)); 
+
+  return t('Done Updating Contents');
+}
+
+function _adc_migration_migrate_faq(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/updates-faq.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+
+    $id = $line[0];
+
+    if($line[0]){
+
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "id_faq"){
+        continue;
+      }
+
+      //extraer el nid asociado a ese id_anterior
+      $result2 = db_query("SELECT entity_id FROM field_data_field_id_anterior WHERE bundle = 'pregunta_frecuente' AND field_id_anterior_value = :id_anterior LIMIT 1", array(":id_anterior" => $id))->fetchAssoc();
+
+      //realizar las actualizaciones necesarias a nivel de db
+      if (!empty($result2['entity_id'])){
+        //cargar node y guardar la info necesaria
+        $node_faq = node_load($result2['entity_id']);
+
+        $tema_faq = $line[1];
+        $pregunta = $line[3];
+        $respuesta = $line[4];
+        $estado_publicacion = $line[5];
+        $id_usuario_foro = $line[6];
+        $fecha_creacion = $line[7];
+        $fecha_modificacion = $line[9];
+
+        //mapeos varios
+        $uid_real = get_uid_usuario($id_usuario_foro);
+
+        $node_faq->uid = $uid_real;
+
+        //actualizar directamente en la BD las fechas de creacion y actualizacion
+        $timestamp_creation = strtotime($fecha_creacion);
+        $timestamp_modification = strtotime($fecha_modificacion);
+
+        if (!($timestamp_creation > 0)){
+          $timestamp_creation = time();
+        }
+
+        if (!($timestamp_modification > 0)){
+          $timestamp_modification = time();
+        }
+
+        $node_faq->field_fecha_publicacion[LANGUAGE_NONE][0]['value'] = $timestamp_creation;
+
+        drupal_set_message(t("Updating node @node FAQ With External id @external", array("@node" => $node_clasi->nid, "@external" => $id)), "status");
+
+        node_save($node_faq);
+
+        //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+        $updated = db_update('node')
+          ->fields(array(
+            'created' => $timestamp_creation,
+            'changed' => $timestamp_modification,
+          ))
+          ->condition('nid', $result2['entity_id'], '=')
+          ->execute();
+
+        if ($updated < 1){
+          drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $result2['entity_id'])), "status");
+        }
+
+        $arreglo_updated[] = $node_faq->nid;
+        $index_updated++;
+        $last_record = $id;
+
+      } else {
+          $arreglo_notupdated[] = $id;
+          $index_not_updated++;  
+      }
+
+
+    }
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_migrate_glosario(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/migration-glosarios.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+
+      $id = $line[0];
+      $palabra_glosario = $line[1];
+      $updates = "";
+
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "id_glosario"){
+        continue;
+      }
+
+      $term_glosario = taxonomy_get_term_by_name($palabra_glosario);
+
+      //realizar las actualizaciones necesarias a nivel de db
+      if (count($term_glosario) > 0){
+
+        $anexo_id_glosario = $line[2];
+        $nombre_imagen = $line[3];
+        $estado_publicacion = $line[5];
+        $id_usuario_creacion = $line[6];
+        $fecha_creacion = $line[7];
+        $fecha_modificacion = $line[9];
+        $fuente = $line[10];
+        $descripcion = $line[11];
+
+        //mirar cuantos objetos de $term_glosario hay con vid 22
+        $tmp = array_values($term_glosario);
+
+        foreach ($tmp as $termino) {
+          if ($termino->vid == "22"){
+             $updates = $termino;
+           }
+        }
+
+        if ($updates->vid == "22"){
+          //actualizar informacion
+          $updates->description = $descripcion;
+          $updates->format = "full_html";
+          $updates->field_fuente_de_informacion[LANGUAGE_NONE][0]['value'] = $fuente;
+          $updates->field_fuente_de_informacion[LANGUAGE_NONE][0]['format'] = 'full_html';
+          $updates->field_fuente_de_informacion[LANGUAGE_NONE][0]['safe_value'] = $fuente;
+          $updates->field_id_anterior_taller[LANGUAGE_NONE][0]['value'] = $id;
+
+          $pos = 0;
+
+          //Poner pie de pagina correcto
+          $updates->field_imagen_glosario[LANGUAGE_NONE][$pos]['alt'] = $palabra_glosario;
+          $updates->field_imagen_glosario[LANGUAGE_NONE][$pos]['title'] = $palabra_glosario; 
+
+          dpm($updates);
+
+          //mirar si ya hay fotos, si hay fotos, sacar el ultimo elemento del array disponible
+          /* if (count($updates->field_imagen_glosario) >= 1){
+            $pos = count($updates->field_imagen_glosario[LANGUAGE_NONE]);
+          } else {
+            $pos = 0;
+          }
+
+          $path_imagen = "public://glosario/imagenes/" . $nombre_imagen; */
+
+          /*if (!file_exists($path_imagen)){
+            $path_imagen2 = "public://imagenes/" . $nombre_imagen;
+
+            if (file_exists($path_imagen2)){
+
+              $file_temp = file_get_contents($path_imagen2);
+
+              // Saves a file to the specified destination and creates a database entry.
+              $file_temp = file_save_data($file_temp, $path_imagen, FILE_EXISTS_RENAME);
+
+              file_usage_add($file_temp, 'adc_migration', 'node', $file_temp->fid);
+
+              $updates->field_imagen_glosario = array(
+                LANGUAGE_NONE => array(
+                  $pos => array(
+                    'fid' => $file_temp->fid,
+                    'filename' => $file_temp->filename,
+                    'filemime' => $file_temp->filemime,
+                    'uid' => 1,
+                    'uri' => $file_temp->uri,
+                    'status' => 1,
+                    'display' => 1
+                  )
+                )
+              );
+     
+              $updates->field_imagen_glosario[LANGUAGE_NONE][$pos]['alt'] = $palabra_glosario;
+              $updates->field_imagen_glosario[LANGUAGE_NONE][$pos]['title'] = $palabra_glosario; 
+
+              drupal_set_message(t("Imagen creada: @imagen", array("@imagen" => $path_imagen)), "status");
+
+              image_path_flush($updates->field_imagen_glosario[LANGUAGE_NONE][$pos]['uri']);
+            } else {
+              dpm("no hay imagen en public://imagenes/");
+            }
+          } else {
+            dpm("Ya esta la imagen en public://glosario/imagenes/");
+          } */
+
+          //cargar la imagen y agregar la información que es
+
+          drupal_set_message(t("Actualizando el siguiente termino: @nombre_termino", array("@nombre_termino" => $palabra_glosario)), "status");
+
+          $res = taxonomy_term_save($updates);
+
+          $arreglo_updated[] = $updates->tid;
+          $index_updated++;
+          $last_record = $id;
+        } else {
+          drupal_set_message(t("El siguiente termino no fue actualizado porque no esta en el vocabulario glosario: @nombre_termino", array("@nombre_termino" => $palabra_glosario)), "status");
+
+          $arreglo_notupdated[] = $id;
+          $index_not_updated++;
+        }
+      } else {
+        //si no existe, intentar crearlo
+        $anexo_id_glosario = $line[2];
+        $nombre_imagen = $line[3];
+        $estado_publicacion = $line[5];
+        $id_usuario_creacion = $line[6];
+        $fecha_creacion = $line[7];
+        $fecha_modificacion = $line[9];
+        $fuente = $line[10];
+        $descripcion = $line[11];
+
+        $new_glosario = array(
+          'name' => $palabra_glosario,
+          'vid' => 22,
+          'description' => "",
+        );
+
+        $newterm = new stdClass();
+        $newterm->name = $palabra_glosario;
+        $newterm->vid = 22;
+        $newterm->descripcion = $descripcion;
+
+        taxonomy_term_save($newterm);
+
+        $term_glosario = taxonomy_get_term_by_name($palabra_glosario);
+
+        $tmp = array_values($term_glosario);
+
+        $updates = $tmp[0];
+
+        if (is_null($descripcion)){
+          $descripcion = $palabra_glosario;
+        }
+
+        //actualizar informacion
+        $updates->descripcion = $descripcion;
+        $updates->field_fuente_de_informacion[LANGUAGE_NONE][0]['value'] = $fuente;
+        $updates->field_fuente_de_informacion[LANGUAGE_NONE][0]['format'] = 'full_html';
+        $updates->field_fuente_de_informacion[LANGUAGE_NONE][0]['safe_value'] = $fuente;
+        $updates->field_id_anterior_taller[LANGUAGE_NONE][0]['value'] = $id;
+
+        $path_imagen = "public://glosario/imagenes/" . $nombre_imagen;
+
+        if (!file_exists($path_imagen)){
+            $path_imagen2 = "public://imagenes/" . $nombre_imagen;
+
+            $pos = 0;
+
+            if (file_exists($path_imagen2)){
+
+              $file_temp = file_get_contents($path_imagen2);
+
+              // Saves a file to the specified destination and creates a database entry.
+              $file_temp = file_save_data($file_temp, $path_imagen2, FILE_EXISTS_RENAME);
+
+              file_usage_add($file_temp, 'adc_migration', 'node', $file_temp->fid);
+
+              $updates->field_imagen_glosario = array(
+                LANGUAGE_NONE => array(
+                  $pos => array(
+                    'fid' => $file_temp->fid,
+                    'filename' => $file_temp->filename,
+                    'filemime' => $file_temp->filemime,
+                    'uid' => 1,
+                    'uri' => $file_temp->uri,
+                    'status' => 1,
+                    'display' => 1
+                  )
+                )
+              );
+     
+              $updates->field_imagen_glosario[LANGUAGE_NONE][$pos]['alt'] = $palabra_glosario;
+              $updates->field_imagen_glosario[LANGUAGE_NONE][$pos]['title'] = $palabra_glosario; 
+
+              drupal_set_message(t("Imagen creada: @imagen", array("@imagen" => $path_imagen)), "status");
+
+              image_path_flush($updates->field_imagen_glosario[LANGUAGE_NONE][$pos]['uri']);
+            } else {
+              dpm("no hay imagen en public://imagenes/");
+            }
+        } else {
+          dpm("Ya esta la imagen en public://glosario/imagenes/");
+        }
+
+        drupal_set_message(t("Creando el siguiente termino: @nombre_termino", array("@nombre_termino" => $palabra_glosario)), "status");
+
+        $res = taxonomy_term_save($updates);
+
+        $arreglo_updated[] = $updates->tid;
+        $index_updated++;
+        $last_record = $id;    
+      }
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_migrate_foros(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/migration-foros.csv';
+  $path_comentarios = DRUPAL_ROOT . '/sites/default/files/migration/comentarios-foros.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+      $id = $line[0];
+
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "id_foro"){
+        continue;
+      }
+
+      //extraer el nid asociado a ese id_anterior
+      $result = db_query("SELECT entity_id FROM field_data_field_id_anterior WHERE bundle = 'foro' AND field_id_anterior_value = :id_anterior LIMIT 1", array(":id_anterior" => $id))->fetchAssoc();
+
+      //realizar las actualizaciones necesarias a nivel de db
+      if (!empty($result['entity_id'])){
+        //cargar node y guardar la info necesaria
+        $node_foro = node_load($result['entity_id']);
+
+        $nombre = $line[1];
+        $descripcion = $line[2];
+        $estado_publicacion = $line[3];
+        $fecha_inicio = $line[4];
+        $fecha_fin = $line[5];
+        $id_usuario_creacion = $line[6];
+        $fecha_creacion = $line[7];
+        $fecha_modificacion = $line[9];
+
+        //mapeos varios
+        $node_foro->uid = get_uid_usuario($id_usuario_creacion);
+
+        //fechas inicios y fin eventos
+        if(isset($fecha_inicio) && !empty($fecha_inicio)){
+          $tmpfecha = explode(" ", $fecha_inicio);
+          $tmpfecha2 = explode("/", $tmpfecha[0]);
+          $fecha_inicio = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . " 00:00:00";
+        }
+
+        if(isset($fecha_fin) && !empty($fecha_fin)){
+          $tmpfecha = explode(" ", $fecha_fin);
+          $tmpfecha2 = explode("/", $tmpfecha[0]);
+          $fecha_fin = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . " 00:00:00";
+        }
+
+        $node_foro->publish_on = strtotime($fecha_inicio);
+        $node_foro->unpublish_on = strtotime($fecha_fin);
+
+        $node_foro->field_fecha_publicacion[LANGUAGE_NONE][0]['value'] = strtotime($fecha_inicio);
+        $node_foro->field_fecha_despublicacion[LANGUAGE_NONE][0]['value'] = strtotime($fecha_fin);
+
+        //leer archivo comentarios
+        $file_comentarios = fopen($path_comentarios, 'r');
+
+        while (($line_comentarios = fgetcsv($file_comentarios)) !== FALSE) {
+          if ($line_comentarios[0]){
+            $foro_id = $line_comentarios[1];
+            $comentario = $line_comentarios[2];
+            $nombre_autor = $line_comentarios[8];
+            $correo_autor = $line_comentarios[9];
+
+            $foro_id = str_replace(".", "", $foro_id);
+            $foro_id = str_replace(",", "", $foro_id);
+
+            $foro_id = (int) $foro_id;
+
+            //hay un comentario asociado al foro en proceso
+            if ($id == $foro_id){
+              $comment = (object) array(
+                'nid' => $node_foro->nid,
+                'cid' => 0,
+                'pid' => 0,
+                'uid' => 0,
+                'mail' => $correo_autor,
+                'is_anonymous' => 0,
+                'homepage' => '',
+                'status' => COMMENT_PUBLISHED,
+                'subject' => $nombre_autor,
+                'language' => LANGUAGE_NONE,
+                'comment_body' => array(
+                  LANGUAGE_NONE => array(
+                    0 => array (
+                      'value' => $comentario,
+                      'format' => 'filtered_html'
+                    )
+                  )
+                ),
+              );
+
+              comment_submit($comment);
+              comment_save($comment);
+
+            }
+          }
+        }
+
+        fclose($file_comentarios);
+
+        drupal_set_message(t("Updating node @node Foro With External id @external", array("@node" => $node_foro->nid, "@external" => $id)), "status");
+
+        node_save($node_foro);
+
+        //actualizar directamente en la BD las fechas de creacion y actualizacion
+        $timestamp_creation = strtotime($fecha_creacion);
+        $timestamp_modification = strtotime($fecha_modificacion);
+
+        if (!($timestamp_creation > 0)){
+          $timestamp_creation = time();
+        }
+
+        if (!($timestamp_modification > 0)){
+          $timestamp_modification = time();
+        }
+
+        //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+        $updated = db_update('node')
+          ->fields(array(
+            'created' => $timestamp_creation,
+            'changed' => $timestamp_modification,
+          ))
+          ->condition('nid', $result['entity_id'], '=')
+          ->execute();
+
+        if ($updated < 1){
+          drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $result['entity_id'])), "status");
+        }
+
+        $arreglo_updated[] = $node_foro->nid;
+        $index_updated++;
+        $last_record = $id;
+
+      } else {
+        //intentar crear el foro con sus comentarios
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;
+      }
+
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_update_talleres(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/talleres.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+   //read csv file
+  $file = fopen($path, 'r'); 
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+      $id = $line[0];
+
+      if ($id == "id_taller"){
+        continue;
+      }
+
+      //extraer el nid asociado a ese id_anterior
+      //el id tiene coma o punto
+      $result = db_query("SELECT entity_id FROM field_data_field_id_anterior_taller WHERE bundle = 'taller' AND field_id_anterior_taller_value = :id_anterior LIMIT 1", array(":id_anterior" => $id))->fetchAssoc();
+
+      //realizar las actualizaciones necesarias a nivel de db
+      if (!empty($result['entity_id'])){
+        $node_taller = node_load($result['entity_id']);
+
+        //mirar en los productos si esta relacionado el taller
+        //pueden ser varios
+        $result2 = db_query("SELECT entity_id FROM field_data_field_id_taller_rel WHERE bundle = 'producto_artesano' AND field_id_taller_rel_target_id = :id_anterior", array(":id_anterior" => $result['entity_id']))->fetchAll();
+
+        /* $count = 0;
+
+        foreach ($result2 as $producto) {
+          $node_taller->field_productos_relacionados[LANGUAGE_NONE][$count]['target_id'] = $producto->entity_id;
+          $count++;
+        } */
+
+        //buscar la primera imagen de algun producto y ponerlo en taller
+        foreach ($result2 as $producto) {
+          $node_producto = node_load($producto->entity_id);
+
+          if (count($node_producto->field_imagenes) > 0){
+            //posible imagen, cargar la primera
+            $fid = $node_producto->field_imagenes[LANGUAGE_NONE][0]['fid'];
+            if ($fid > 0){
+              $img_object = file_load($fid);
+              $node_taller->field_imagenes_taller[LANGUAGE_NONE][0] = (array) $img_object;
+              break;
+            }
+          }
+        }
+
+        $estado_taller = $line[18];
+        $estado_publicacion = $line[20];
+        $fecha_creacion = $line[22];
+        $fecha_modificacion = $line[24];
+
+        $tid_estado_taller = get_estado_publicacion_taller($estado_taller);
+
+        if ($estado_publicacion == 'A' || $estado_publicacion == 'V'){
+          $node_taller->status = 1;
+        } else {
+          $node_taller->status = 0;
+        }
+
+        $node_taller->field_estado_taller[LANGUAGE_NONE][0]['value'] = $tid_estado_taller;
+
+        //actualizar directamente en la BD las fechas de creacion y actualizacion
+        $timestamp_creation = strtotime($fecha_creacion);
+        $timestamp_modification = strtotime($fecha_modificacion);
+
+        if (!($timestamp_creation > 0)){
+          $timestamp_creation = time();
+        }
+
+        if (!($timestamp_modification > 0)){
+          $timestamp_modification = time();
+        }
+
+        drupal_set_message(t("Updating node @node Taller With External id @external", array("@node" => $result['entity_id'], "@external" => $id)), "status");
+
+        node_save($node_taller);
+
+        $transition = new WorkflowTransition();
+        $entity_type = 'node';
+        $field_name = 'field_estado_taller';
+        $old_sid = $node_taller->field_estado_taller[LANGUAGE_NONE][0]['value']; // sid of your Draft status
+        $new_sid = $tid_estado_taller; // sid of your Saved status
+        $uid = 1; // You can change with uid of author.
+        $stamp = REQUEST_TIME;
+        $comment = 'Cambio estado taller';
+        $transition->setValues($entity_type, $node_taller, $field_name, $old_sid, $new_sid, $uid, $stamp, $comment);
+        workflow_execute_transition($entity_type, $node_taller, $field_name, $transition, $force = TRUE); 
+
+        //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+        $updated = db_update('node')
+          ->fields(array(
+            'created' => $timestamp_creation,
+            'changed' => $timestamp_modification,
+          ))
+          ->condition('nid', $result['entity_id'], '=')
+          ->execute();  
+
+        $arreglo_updated[] = $result['entity_id'];
+        $index_updated++;
+        $last_record = $id;
+      } else {
+        //intentar crear el foro con sus comentarios
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;
+      }
+  }
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents');   
+}
+
+function _adc_migration_update_producto_talleres(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/productos_taller.csv';
+  $path_producto_imagen = DRUPAL_ROOT . '/sites/default/files/migration/producto_imagen.csv';
+  $path_file_imagenes = DRUPAL_ROOT . '/sites/default/files/migration/path_imagenes.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+  $fids = "/tmp/fids.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $index_img = 0;
+  $index_fids = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $arreglo_imgs = array();
+  $arreglo_fids = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+      $id = $line[0];
+
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "id_producto"){
+        continue;
+      }
+
+      //extraer el nid asociado a ese id_anterior
+      $result = db_query("SELECT entity_id FROM field_data_field_id_anterior_prod_artes WHERE field_id_anterior_prod_artes_value = :id_anterior LIMIT 1", array(":id_anterior" => $id))->fetchAssoc();
+
+      //actualizar imagenes
+      /*if (!empty($result['entity_id'])){
+        //cargar node y guardar la info necesaria
+        $node_producto = node_load($result['entity_id']);
+
+        $file_producto_imagenes = fopen($path_producto_imagen, 'r');
+
+        file_put_contents("/tmp/casi.json", json_encode($id));
+
+        $pos = 0;
+
+        $node_producto->field_imagenes[LANGUAGE_NONE] = array();
+
+        while (($line_producto_imagenes = fgetcsv($file_producto_imagenes)) !== FALSE) {
+          $pti_id = $line_producto_imagenes[0];
+          $id_producto = $line_producto_imagenes[1];
+          $id_imagen = $line_producto_imagenes[3];
+
+          $id_producto = str_replace(".", "", $id_producto);
+          $id_producto = str_replace(",", "", $id_producto);
+
+          $id_producto = (int) $id_producto;
+
+          if ($id_producto == $id){
+            //abrir archivo donde deberian estar los paths y alt text y demas
+            $file_file_imagenes = fopen($path_file_imagenes, 'r');
+
+            file_put_contents("/tmp/match.json", json_encode($id));
+
+            while (($line_file_imagenes = fgetcsv($file_file_imagenes)) !== FALSE) {
+              $imagen_id = $line_file_imagenes[0];
+              $img_anexo_id = $line_file_imagenes[1];
+              $nombre_imagen = $line_file_imagenes[2];
+              $alt_text = $line_file_imagenes[3];
+              $autor_imagen = $line_file_imagenes[4];
+              $pie_foto = $line_file_imagenes[5];
+
+              //validar que el nombre de imagen no tenga caracteres raros
+              if (strpos($nombre_imagen, "'") || strpos($nombre_imagen, "\"")){
+                 drupal_set_message(t("Imagen con caracteres extranios: @imagen", array("@imagen" => $nombre_imagen)), "status");
+                 continue;
+              }
+
+              if ($imagen_id == $id_imagen){
+                $path_imagen = "public://imagenes/" . $nombre_imagen;
+
+                if (file_exists($path_imagen)){
+
+                    $path_imagen2 = "public://taller/imagenes/" . $nombre_imagen;
+
+                    $file_temp = file_get_contents($path_imagen);
+
+                    // Saves a file to the specified destination and creates a database entry.
+                    $file_temp = file_save_data($file_temp, $path_imagen2, FILE_EXISTS_REPLACE);
+
+                    file_usage_add($file_temp, 'adc_migration', 'node', $file_temp->fid);
+
+                    $node_producto->field_imagenes[LANGUAGE_NONE][$pos] = array(
+                          'fid' => $file_temp->fid,
+                          'filename' => $file_temp->filename,
+                          'filemime' => $file_temp->filemime,
+                          'uid' => 1,
+                          'uri' => $file_temp->uri,
+                          'status' => 1,
+                          'display' => 1
+                    );
+
+                    $node_producto->field_imagenes[LANGUAGE_NONE][$pos]['alt'] = $alt_text;
+                    $node_producto->field_imagenes[LANGUAGE_NONE][$pos]['title'] = $alt_text;
+
+                    drupal_set_message(t("Imagen creada: @imagen", array("@imagen" => $file_temp->uri)), "status");
+
+                    image_path_flush($node_producto->field_imagenes[LANGUAGE_NONE][$pos]['uri']); 
+
+                    $arreglo_fids[] = $file_temp->fid;
+                    $index_fids++;
+
+                    $pos++;
+                } else {
+                    drupal_set_message(t("Imagen no encontrada: @imagen", array("@imagen" => $path_imagen)), "status");
+                }
+
+              }
+
+            }
+
+            fclose($file_file_imagenes);
+
+          } 
+        }
+
+        file_put_contents("/tmp/arregloimgs.json", json_encode($node_producto->field_imagenes));
+
+        node_save($node_producto);
+
+        fclose($file_producto_imagenes);
+
+        $arreglo_updated[] = $node_producto->nid;
+        $index_updated++;
+        $last_record = $id;
+      }*/
+
+      //actualizar otra informacion
+      if (!empty($result['entity_id'])){
+        $estado_producto = $line[4];
+        $estado_publicacion = $line[6];
+        $fecha_creacion = $line[8];
+        $fecha_modificacion = $line[10];
+
+        /*$node_producto = node_load($result['entity_id']);
+
+        node_save($node_producto);*/
+
+        if ($estado_publicacion == 'A' || $estado_publicacion == 'V'){
+          $status = 1;
+        } else {
+          $status = 0;
+        }
+
+       //actualizar directamente en la BD las fechas de creacion y actualizacion
+        $timestamp_creation = strtotime($fecha_creacion);
+        $timestamp_modification = strtotime($fecha_modificacion);
+
+        if (!($timestamp_creation > 0)){
+          $timestamp_creation = time();
+        }
+
+        if (!($timestamp_modification > 0)){
+          $timestamp_modification = time();
+        }
+
+        //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+        $updated = db_update('node')
+          ->fields(array(
+            'created' => $timestamp_creation,
+            'changed' => $timestamp_modification,
+            'status' => $status
+          ))
+          ->condition('nid', $result['entity_id'], '=')
+          ->execute();
+
+        drupal_set_message(t("Cambiando timestamps y estado publicacion: @node", array("@node" => $result['entity_id'])), "status");
+
+        $arreglo_updated[] = $result['entity_id'];
+        $index_updated++;
+        $last_record = $id;
+      }
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+  file_put_contents($fids, json_encode($arreglo_fids));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_update_informacion_noticias_publicaciones(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/contenidos-noticias.csv';
+  $path_file_imagenes = DRUPAL_ROOT . '/sites/default/files/migration/path_imagenes.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $index_contitulo = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $arreglo_contitulo = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+
+    $id = $line[0];
+
+    if($line[0]){
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "id_contenido"){
+        continue;
+      }
+
+      //extraer el nid asociado a ese id_anterior
+      $result = db_query("SELECT entity_id FROM field_data_field_contenido_id WHERE bundle IN ('article', 'page') AND field_contenido_id_value = :id_anterior", array(":id_anterior" => $id))->fetchAssoc();
+
+      //realizar las actualizaciones necesarias a nivel de db
+      if (!empty($result['entity_id'])){
+        //extraer la informacion
+        $autor = $line[9];
+        $summary = $line[10];
+        $imagen_id = $line[12];
+        $estado_publicacion = $line[15];
+        $fecha_inicio = $line[16];
+        $fecha_fin = $line[17];
+        $id_usuario_creacion = $line[18];
+        $fecha_creacion = $line[19];
+        $fecha_modificacion = $line[21];
+        $contenido1 = $line[24];
+        $contenido2 = $line[25];
+        $contenido3 = $line[26];
+
+        $nodo_contenido = node_load($result["entity_id"]);
+
+        $summary = strip_tags(html_entity_decode($summary));
+        $nodo_contenido->body[LANGUAGE_NONE][0]['summary'] = $summary;
+        $nodo_contenido->body[LANGUAGE_NONE][0]['safe_summary'] = $summary;
+
+        $nodo_contenido->body[LANGUAGE_NONE][0]['value']  = $contenido1 . $contenido2 . $contenido3;
+        $nodo_contenido->body[LANGUAGE_NONE][0]['format'] = "full_html";
+
+        //fechas inicios y fin eventos
+        if(isset($fecha_inicio) && !empty($fecha_inicio)){
+          $tmpfecha = explode(" ", $fecha_inicio);
+          $tmpfecha2 = explode("/", $tmpfecha[0]);
+          $fecha_inicio = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . " 00:00:00";
+        }
+
+        if(isset($fecha_fin) && !empty($fecha_fin)){
+          $tmpfecha = explode(" ", $fecha_fin);
+          $tmpfecha2 = explode("/", $tmpfecha[0]);
+          $fecha_fin = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . " 00:00:00";
+        }
+
+        //almacenar fecha de despublicacion en otro campo
+        $nodo_contenido->field_fecha_despublicacion[LANGUAGE_NONE][0]['value'] = strtotime($fecha_fin);
+        $nodo_contenido->field_fecha_publicacion[LANGUAGE_NONE][0]['value'] = strtotime($fecha_inicio);
+
+        //actualizar imagenes
+        //abrir archivo donde deberian estar los paths y alt text y demas
+       $file_file_imagenes = fopen($path_file_imagenes, 'r');
+
+        while (($line_file_imagenes = fgetcsv($file_file_imagenes)) !== FALSE) {
+          $id_imagen = $line_file_imagenes[0];
+
+          if ($id_imagen == $imagen_id){
+            dpm("Se encontro foto");
+            $nombre_imagen = $line_file_imagenes[2];
+            $alt = $line_file_imagenes[3];
+            $title = $line_file_imagenes[3];
+            $imagen_autor = $line_file_imagenes[4];
+            $pie_foto = $line_file_imagenes[5];
+
+            $path_imagen = "public://noticias/imagenes/" . $nombre_imagen;
+
+            if (!file_exists($path_imagen)){
+                $path_imagen2 = "public://imagenes/" . $nombre_imagen;
+
+                $pos = 0;
+
+                if (file_exists($path_imagen2)){
+
+                  $file_temp = file_get_contents($path_imagen2);
+
+                  $dir_noticias = "public://noticias/imagenes/";
+
+                  //file_prepare_directory($dir_noticias, FILE_MODIFY_PERMISSIONS);
+
+                  // Saves a file to the specified destination and creates a database entry.
+                  $file_temp = file_save_data($file_temp, $path_imagen2, FILE_EXISTS_RENAME);
+
+                  file_usage_add($file_temp, 'adc_migration', 'node', $file_temp->fid);
+
+                  $nodo_contenido->field_image = array(
+                    LANGUAGE_NONE => array(
+                      $pos => array(
+                        'fid' => $file_temp->fid,
+                        'filename' => $file_temp->filename,
+                        'filemime' => $file_temp->filemime,
+                        'uid' => 1,
+                        'uri' => $file_temp->uri,
+                        'status' => 1,
+                        'display' => 1
+                      )
+                    )
+                  );
+         
+                  $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['alt'] = $alt;
+                  $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['title'] = $title;
+
+                  $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['image_field_caption']['value'] = $pie_foto;
+                  $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['image_field_caption']['format'] = 'plain_text';
+
+                  drupal_set_message(t("Imagen creada: @imagen", array("@imagen" => $path_imagen)), "status");
+
+                  image_path_flush($nodo_contenido->field_image[LANGUAGE_NONE][$pos]['uri']);
+
+                  $pos++;
+                } else {
+                  dpm("no hay imagen en public://imagenes/");
+                }
+            } else {
+              dpm("Ya esta la imagen en public://noticias/imagenes/");
+            }
+
+          }
+        } 
+
+        fclose($file_file_imagenes);
+
+        drupal_set_message(t("Updating node @node clasificado With External id @external", array("@node" => $nodo_contenido->nid, "@external" => $id)), "status");
+
+        node_save($nodo_contenido);
+
+        //actualizar directamente en la BD las fechas de creacion y actualizacion
+        $timestamp_creation = strtotime($fecha_creacion);
+        $timestamp_modification = strtotime($fecha_modificacion);
+
+        if (!($timestamp_creation > 0)){
+          $timestamp_creation = time();
+        }
+
+        if (!($timestamp_modification > 0)){
+          $timestamp_modification = time();
+        }
+
+        //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+        $updated = db_update('node')
+          ->fields(array(
+            'created' => $timestamp_creation,
+            'changed' => $timestamp_modification,
+          ))
+          ->condition('nid', $result['entity_id'], '=')
+          ->execute();
+
+        if ($updated < 1){
+          drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $result['entity_id'])), "status");
+        }
+
+        $arreglo_updated[] = $result['entity_id'];
+        $index_updated++;
+        $last_record = $id;
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record));  
+      } else {
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;
+        $last_record = $id;
+
+        drupal_set_message(t("Registro que no existe: @id", array("@id" => $id)), "status");
+
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record));  
+      }
+
+    }
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+  drupal_set_message(t("Records con titulo: @records_contitulo", array("@records_contitulo" => $index_contitulo)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+  file_put_contents($contitulo_nodes, json_encode($arreglo_contitulo));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_correccion_fotos_noticias_publicaciones(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/contenidos-noticias.csv';
+  $path_file_imagenes = DRUPAL_ROOT . '/sites/default/files/migration/path_imagenes.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $index_not_piefotos = 0;
+  $index_zero_bytes = 0;
+  $index_noimagen = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $arreglo_nopiefotos = array();
+  $arreglo_cerobytes = array();
+  $arreglo_noimagen = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+    $id = $line[0];
+
+    if($line[0]){
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "id_contenido"){
+        continue;
+      }
+
+      //extraer el nid asociado a ese id_anterior
+      $result = db_query("SELECT entity_id FROM field_data_field_contenido_id WHERE bundle IN ('article', 'page') AND field_contenido_id_value = :id_anterior", array(":id_anterior" => $id))->fetchAssoc();
+
+      //realizar las actualizaciones necesarias a nivel de db
+      if (!empty($result['entity_id'])){
+        //extraer la informacion
+        $autor = $line[9];
+        $summary = $line[10];
+        $imagen_id = $line[12];
+        $estado_publicacion = $line[15];
+        $fecha_inicio = $line[16];
+        $fecha_fin = $line[17];
+        $id_usuario_creacion = $line[18];
+        $fecha_creacion = $line[19];
+        $fecha_modificacion = $line[21];
+        $contenido1 = $line[24];
+        $contenido2 = $line[25];
+        $contenido3 = $line[26];
+
+        $nodo_contenido = node_load($result["entity_id"]);
+
+        $lang = $nodo_contenido->language;
+
+        if ((count($nodo_contenido->field_image) > 0) && isset($nodo_contenido->field_image[LANGUAGE_NONE][0]['filename'])){
+
+          if ($nodo_contenido->field_image[LANGUAGE_NONE][0]['filesize'] == 0){
+            drupal_set_message(t("En el nodo @nid, La siguiente imagen tiene tamanio 0: @filename", array("@nid" => $nodo_contenido->nid, "@filename" => $nodo_contenido->field_image[LANGUAGE_NONE][0]['uri'])), "status"); 
+
+              //actualizar imagenes
+              //abrir archivo donde deberian estar los paths y alt text y demas
+             $file_file_imagenes = fopen($path_file_imagenes, 'r');
+
+              while (($line_file_imagenes = fgetcsv($file_file_imagenes)) !== FALSE) {
+                $id_imagen = $line_file_imagenes[0];
+
+                if ($id_imagen == $imagen_id){
+                  dpm("Se encontro foto en el excel");
+                  $nombre_imagen = $line_file_imagenes[2];
+                  $alt = $line_file_imagenes[3];
+                  $title = $line_file_imagenes[3];
+                  $imagen_autor = $line_file_imagenes[4];
+                  $pie_foto = $line_file_imagenes[5];
+
+                  //borrar primero la referencia de la imagen en la BD, ya que no existen en disco
+                  $fidviejo = $nodo_contenido->field_image[LANGUAGE_NONE][0]['fid'];
+
+                  $obj_image = file_load($fidviejo);
+
+                  if ($obj_image){
+                    if (file_delete($obj_image, TRUE)){
+                      dpm("Se borro la imagen exitosamente");
+                    }
+                  }
+
+                  $timestamp = time();
+
+                  $path_imagen2 = "public://imagenes/" . $nombre_imagen;
+
+                  $path_imagen_remoto = "http://artesaniasdecolombia.com.co/Documentos/Contenido/" . $nombre_imagen;
+
+                  $file_temp = file_get_contents($path_imagen_remoto);
+
+                  if ($file_temp){
+                    drupal_set_message(t("-----SI SE encontro en artesaniasdecolombia.com.co: @imagen", array("@imagen" => $path_imagen_remoto)), "status");
+                    $pos = 0;
+                    // Saves a file to the specified destination and creates a database entry.
+                    $file_temp = file_save_data($file_temp, $path_imagen2, FILE_EXISTS_RENAME);
+
+                    file_usage_add($file_temp, 'adc_migration', 'node', $file_temp->fid);
+
+                    $nodo_contenido->field_image = array(
+                        LANGUAGE_NONE => array(
+                          $pos => array(
+                            'fid' => $file_temp->fid,
+                            'filename' => $file_temp->filename,
+                            'filemime' => $file_temp->filemime,
+                            'uid' => 1,
+                            'uri' => $file_temp->uri,
+                            'status' => 1,
+                            'display' => 1
+                          )
+                        )
+                    );
+                 
+                    $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['alt'] = $alt;
+                    $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['title'] = $title;
+
+                    $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['image_field_caption']['value'] = $pie_foto;
+                    $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['image_field_caption']['format'] = 'plain_text';
+
+                    drupal_set_message(t("Imagen creada: @imagen", array("@imagen" => $file_temp->uri)), "status");
+
+                    image_path_flush($nodo_contenido->field_image[LANGUAGE_NONE][$pos]['uri']);
+
+                    $pos++;
+                  } else {
+                    drupal_set_message(t("La siguiente imagen no se encontro en artesaniasdecolombia.com.co O HAY UN DELAY: @imagen", array("@imagen" => $path_imagen_remoto)), "status");
+                  }
+
+                  node_save($nodo_contenido);    
+
+                  //actualizar directamente en la BD las fechas de creacion y actualizacion
+                  $timestamp_creation = strtotime($fecha_creacion);
+                  $timestamp_modification = strtotime($fecha_modificacion);
+
+                  if (!($timestamp_creation > 0)){
+                    $timestamp_creation = time();
+                  }
+
+                  if (!($timestamp_modification > 0)){
+                    $timestamp_modification = time();
+                  }
+
+                  //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+                  $updated = db_update('node')
+                      ->fields(array(
+                        'created' => $timestamp_creation,
+                        'changed' => $timestamp_modification,
+                      ))
+                      ->condition('nid', $result['entity_id'], '=')
+                      ->execute();
+
+                  if ($updated < 1){
+                    drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $result['entity_id'])), "status");
+                  }
+                }
+              } 
+
+              fclose($file_file_imagenes);
+
+              drupal_set_message(t("Updating node @node clasificado With External id @external", array("@node" => $nodo_contenido->nid, "@external" => $id)), "status");
+
+
+              $arreglo_cerobytes[] = $result['entity_id'];
+              $index_zero_bytes++;
+          }
+
+          if (!isset($nodo_contenido->field_image[LANGUAGE_NONE][0]['image_field_caption'])){
+             drupal_set_message(t("En el nodo @nid, La siguiente imagen no tiene pie de foto: @filename", array("@nid" => $nodo_contenido->nid, "@filename" => $nodo_contenido->field_image[LANGUAGE_NONE][0]['uri'])), "status");
+
+             $file_file_imagenes = fopen($path_file_imagenes, 'r');
+
+            while (($line_file_imagenes = fgetcsv($file_file_imagenes)) !== FALSE) {
+              $id_imagen = $line_file_imagenes[0];
+
+              if ($id_imagen == $imagen_id){
+                $nombre_imagen = $line_file_imagenes[2];
+                $alt = $line_file_imagenes[3];
+                $title = $line_file_imagenes[3];
+                $imagen_autor = $line_file_imagenes[4];
+                $pie_foto = $line_file_imagenes[5];
+
+                $pos = 0;
+
+                $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['alt'] = $alt;
+                $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['title'] = $title;
+
+                $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['image_field_caption']['value'] = $pie_foto;
+                $nodo_contenido->field_image[LANGUAGE_NONE][$pos]['image_field_caption']['format'] = 'plain_text';
+
+                drupal_set_message(t("Imagen creada: @imagen", array("@imagen" => $path_imagen)), "status");
+              }
+            }   
+
+            fclose($file_file_imagenes); 
+
+            node_save($nodo_contenido);    
+
+           //actualizar directamente en la BD las fechas de creacion y actualizacion
+            $timestamp_creation = strtotime($fecha_creacion);
+            $timestamp_modification = strtotime($fecha_modificacion);
+
+            if (!($timestamp_creation > 0)){
+              $timestamp_creation = time();
+            }
+
+            if (!($timestamp_modification > 0)){
+              $timestamp_modification = time();
+            }
+
+            //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+            $updated = db_update('node')
+              ->fields(array(
+                'created' => $timestamp_creation,
+                'changed' => $timestamp_modification,
+              ))
+              ->condition('nid', $result['entity_id'], '=')
+              ->execute();
+
+            if ($updated < 1){
+              drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $result['entity_id'])), "status");
+            }
+
+
+             $arreglo_nopiefotos[] = $result['entity_id'];
+             $index_not_piefotos++;         
+          }
+
+        } else {
+            drupal_set_message(t("El siguiente nodo no tiene imagen: @node", array("@node" => $result['entity_id'])), "status");
+            $arreglo_noimagen[] = $result['entity_id'];
+            $index_noimagen++;
+        }
+
+        unset($nodo_contenido);
+
+        $last_record = $id;
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record)); 
+      } else {
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;
+        $last_record = $id;
+
+        drupal_set_message(t("Registro que no existe: @id", array("@id" => $id)), "status");
+
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record));          
+      } 
+
+    }
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records no pie: @records_updated", array("@records_updated" => $index_not_piefotos)), "status");
+  drupal_set_message(t("Records index_zero_bytes: @records_notupdated", array("@records_notupdated" => $index_zero_bytes)), "status");
+  drupal_set_message(t("Records con no imagen: @records_noimagen", array("@records_noimagen" => $index_noimagen)), "status");
+  drupal_set_message(t("Last External ID record updated: @external", array("@external" => $last_record)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_migrate_asesorias(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/contenidos-asesorias.csv';
+  $path_funcionarios = DRUPAL_ROOT . '/sites/default/files/migration/funcionarios.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  $index_updated = 0;
+  $index_not_updated = 0;
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+    //leer informacion del cvs
+    $id = $line[0];
+
+    if($line[0]){
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "ASESORIA_ID"){
+        continue;
+      }
+
+      //obtener el resto de valores
+      $descripcion = $line[1];
+      $tipo_asesoria = $line[2];
+      $asesor_id = $line[3];
+      $fecha_inicio = $line[4];
+      $fecha_fin = $line[5];
+      $hora_inicio = $line[6];
+      $hora_final = $line[7];
+      $cupos = $line[8];
+      $estado = $line[9];
+      $id_usuario_creacion = $line[10];
+      $fecha_creacion = $line[11];
+      $fecha_modificacion = $line[13];
+
+      //extraer el nid asociado a ese id_anterior
+      $result = db_query("SELECT entity_id FROM field_data_field_id_anterior WHERE bundle = 'gestionar_jornada' AND field_id_anterior_value = :id_anterior", array(":id_anterior" => $id))->fetchAssoc();
+
+      if (!empty($result['entity_id'])){
+        //actualizaciones
+      } else {
+        //mapeos
+        if ($estado == 'A' || $estado == 'V'){
+          $estado = 1;
+        } else {
+          $estado = 0;
+        }
+
+        // Fecha de Creación
+        if(!empty($fecha_creacion) && ($fecha_creacion != '#N/A')){
+          $create_date = $fecha_creacion;
+          $timestamp_creation = strtotime($create_date);
+        } else{
+          $timestamp_creation = time();
+        }
+
+        // Fecha de Modificación
+        if(!empty($fecha_modificacion) && ($fecha_modificacion != '#N/A')){
+          $edit_date = $fecha_modificacion;
+          $timestamp_modification = strtotime($edit_date);
+        }else{
+          $timestamp_modification = time();
+        }
+
+        //Mapear Id del usuario (portal viejo) a UID usuario
+        $uid = get_uid_usuario($id_usuario_creacion);
+
+        //fechas inicios y fin eventos
+        if(isset($fecha_inicio) && !empty($fecha_inicio)){
+          $tmpfecha = explode(" ", $fecha_inicio);
+          $tmpfecha2 = explode("/", $tmpfecha[0]);
+          $fecha_inicio = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . $hora_inicio;
+        }
+
+        if(isset($fecha_fin) && !empty($fecha_fin)){
+          $tmpfecha = explode(" ", $fecha_fin);
+          $tmpfecha2 = explode("/", $tmpfecha[0]);
+          $fecha_fin = $tmpfecha2[0] . "/" . $tmpfecha2[1] . "/" . $tmpfecha2[2] . $hora_final;
+        }
+
+        $tid_tipo_asesoria = get_tipo_de_asesoria($tipo_asesoria);
+
+        //crear una entidad y guardar la info
+        $node = entity_create('node', array('type' => 'gestionar_jornada'));
+
+        $node->uid = $uid;
+
+        $jornada_wrap = entity_metadata_wrapper('node', $node);
+
+        $jornada_wrap->title->set($descripcion);
+        $jornada_wrap->body->set(array('value' => $descripcion));
+        $jornada_wrap->status = $estado;
+        $jornada_wrap->field_id_anterior = $id;
+        $jornada_wrap->field_cupos_asesoria = $cupos;
+        $jornada_wrap->status = $estado;
+
+        $_SESSION["fecha_inicio_evento_migracion"] = strtotime($fecha_inicio);
+        $_SESSION["fecha_fin_evento_migracion"] = strtotime($fecha_fin);
+
+        drupal_set_message(t("Creating node jornada asesoria With External id @external", array("@external" => $id)), "status");
+
+        $res = $jornada_wrap->save();
+
+        $nuevonodo = $res->raw();
+
+        if ($nuevonodo->nid){
+          $node_jornada = node_load($nuevonodo->nid);
+
+          dpm(strtotime($fecha_inicio));
+          dpm(strtotime($fecha_fin));
+
+          $node_jornada->field_fecha_asesoria[LANGUAGE_NONE][0]['value'] = strtotime($fecha_inicio);
+          $node_jornada->field_fecha_asesoria[LANGUAGE_NONE][0]['value2'] = strtotime($fecha_fin);
+          $node_jornada->timezone = "America/Bogota";
+          $node_jornada->timezone_db = "America/Bogota";
+
+          $node_jornada->field_asesorias[LANGUAGE_NONE][0]['tid'] = $tid_tipo_asesoria;
+
+          $node_jornada->field_sede_asesoria[LANGUAGE_NONE][0]['tid'] = 1542;
+
+          $node_jornada->field_requisitos[LANGUAGE_NONE][0]['tid'] = 1823;
+
+          $node_jornada->last_comment_uid = 0;
+
+          node_save($node_jornada);
+
+          //poner la fecha real de creacion y modificacion
+          //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+          $nuevonid = $nuevonodo->nid;
+
+          //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+          $updated = db_update('node')
+            ->fields(array(
+              'created' => $timestamp_creation,
+              'changed' => $timestamp_modification,
+            ))
+            ->condition('nid', $nuevonid, '=')
+            ->execute();
+
+          if ($updated < 1){
+            drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $nuevonid)), "status");
+          }
+
+          $arreglo_updated[] = $nuevonodo->nid;
+          $index_updated++;
+          $last_record = $id;       
+          file_put_contents("/tmp/lastrecord.json", json_encode($last_record));   
+        }
+      }
+
+    }    
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_migrate_procesos_contratacion(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/contenidos-procesos-contratacion.csv';
+  $path_funcionarios = DRUPAL_ROOT . '/sites/default/files/migration/funcionarios.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  $index_updated = 0;
+  $index_not_updated = 0; 
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+    //leer informacion del cvs
+    $id = $line[0];
+
+    if($line[0]){
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "PROCESO_ID"){
+        continue;
+      }
+
+      //obtener el resto de valores
+      $proceso_numero = $line[1];
+      $tipo_proceso = $line[2];
+      $nombre_proceso = $line[3];
+      $tipo_cuantia = $line[4];
+      $tipo_contrato = $line[5];
+      $objeto_proceso = $line[6];
+      $funcionario_id = $line[7];
+      $tipo_moneda = $line[8];
+      $valor_proceso = $line[9];
+      $proceso_doc_pais = $line[10];
+      $proceso_doc_departamento = $line[11];
+      $proceso_doc_ciudad = $line[12];
+      $proceso_doc_direccion = $line[13];
+      $proceso_ofer_pais = $line[14];
+      $proceso_ofer_departamento = $line[15];
+      $proceso_ofer_ciudad = $line[16];
+      $proceso_ofer_direccion = $line[17];
+      $fecha_inicio = $line[18];
+      $fecha_fin = $line[19];
+      $estado = $line[20];
+      $id_usuario_creacion = $line[21];
+      $fecha_creacion = $line[22];
+      $fecha_modificacion = $line[24];  
+
+
+      //extraer el nid asociado a ese id_anterior
+      $result = db_query("SELECT entity_id FROM field_data_field_id_anterior WHERE bundle = 'proceso_contratacion' AND field_id_anterior_value = :id_anterior LIMIT 1", array(":id_anterior" => $id))->fetchAssoc();
+
+      if (!empty($result['entity_id'])){
+        //actualizaciones
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;
+        $last_record = $id;
+      } else { 
+        //hacer mapeos
+        $uid = get_uid_usuario($id_usuario_creacion);
+
+        $valor_proceso = str_replace(".", "", $valor_proceso);
+        $valor_proceso = str_replace(",", "", $valor_proceso);
+
+        if ($estado == 'A' || $estado == 'V'){
+          $estado = 1;
+        } else {
+          $estado = 0;
+        }
+
+        //pais, depto y ciudad si existen
+        if(isset($proceso_doc_pais) && !empty($proceso_doc_pais)){
+          $tid_pais_doc = get_tid_by_codigo_pais($proceso_doc_pais);
+          if (!$tid_pais_doc){
+            $tid_pais_doc = 196;
+          }
+        }
+
+        if(!empty($tid_pais_doc) && $tid_pais_doc == '196' && isset($proceso_doc_departamento) && !empty($proceso_doc_departamento)){
+          $tid_depa_doc = get_tid_by_codigo_departamento($proceso_doc_departamento);
+        }
+
+        if(!empty($tid_pais_doc) && $tid_pais_doc == '196' && !empty($tid_depa_doc) && isset($proceso_doc_ciudad) && !empty($proceso_doc_ciudad)){
+          $tid_ciudad_doc = get_tid_by_codigo_ciudad($proceso_doc_ciudad);
+        }
+
+        //pais, depto y ciudad si existen
+        if(isset($proceso_ofer_pais) && !empty($proceso_ofer_pais)){
+          $tid_pais_ofer = get_tid_by_codigo_pais($proceso_ofer_pais);
+          if (!$tid_pais_ofer){
+            $tid_pais_ofer = 196;
+          }
+        }
+
+        if(!empty($tid_pais_ofer) && $tid_pais_ofer == '196' && isset($proceso_ofer_departamento) && !empty($proceso_ofer_departamento)){
+          $tid_depa_ofer = get_tid_by_codigo_departamento($proceso_ofer_departamento);
+        }
+
+        if(!empty($tid_pais_ofer) && $tid_pais_ofer == '196' && !empty($tid_depa_ofer) && isset($proceso_ofer_ciudad) && !empty($proceso_ofer_ciudad)){
+          $tid_ciudad_ofer = get_tid_by_codigo_ciudad($proceso_ofer_ciudad);
+        }
+
+        //tipo de contrato
+        $tid_tipo_contrato = get_categoria_contrato($tipo_contrato);
+
+        //crear una entidad y guardar la info
+        $node = entity_create('node', array('type' => 'proceso_contratacion'));
+
+        $node->uid = $uid;
+
+        $proceso_wrap = entity_metadata_wrapper('node', $node);
+
+        $proceso_wrap->title->set($nombre_proceso);
+        $proceso_wrap->body->set(array('value' => $objeto_proceso));
+        $proceso_wrap->field_num_proceso = $proceso_numero;
+        $proceso_wrap->field_presupuesto_aprobado = $valor_proceso;
+        $proceso_wrap->field_contratante->set('ARTESANÍAS DE COLOMBIA');
+        $proceso_wrap->field_direccion_proceso_document = $proceso_doc_direccion;
+        $proceso_wrap->field_direccion_proceso_oferta = $proceso_ofer_direccion;
+        $proceso_wrap->field_id_anterior = $id;
+        $proceso_wrap->field_tipo_de_moneda = $tipo_moneda;
+        $proceso_wrap->status = $estado;
+
+        drupal_set_message(t("Creating node proceso contratacion With External id @external", array("@external" => $id)), "status");
+
+        $res = $proceso_wrap->save();
+
+        $nuevonodo = $res->raw();
+
+        if ($nuevonodo->nid){
+          $node_proceso = node_load($nuevonodo->nid);
+
+          $node_proceso->field_ubicacion_documentos[LANGUAGE_NONE][0]['tid'] = 1541;
+          $node_proceso->field_ubicacion_pres_oferta[LANGUAGE_NONE][0]['tid'] = 1541;
+
+          //obtencion documentos
+          if(!empty($tid_pais_doc)){
+            $node_proceso->field_ubicacion_ciudad_obtencion[LANGUAGE_NONE][0]['tid'] = $tid_pais_doc;
+          }
+
+          if(!empty($tid_depa_doc)){
+            $node_proceso->field_ubicacion_ciudad_obtencion[LANGUAGE_NONE][0]['tid'] = $tid_depa_doc;
+          }
+
+          if(!empty($tid_ciudad_doc)){
+            $node_proceso->field_ubicacion_ciudad_obtencion[LANGUAGE_NONE][0]['tid'] = $tid_ciudad_doc;
+          }
+
+          //presentacion
+          if(!empty($tid_pais_ofer)){
+            $node_proceso->field_ubicacion_ciudad_presentac[LANGUAGE_NONE][0]['tid'] = $tid_pais_ofer;
+          }
+
+          if(!empty($tid_depa_ofer)){
+            $node_proceso->field_ubicacion_ciudad_presentac[LANGUAGE_NONE][0]['tid'] = $tid_depa_ofer;
+          }
+
+          if(!empty($tid_ciudad_ofer)){
+            $node_proceso->field_ubicacion_ciudad_presentac[LANGUAGE_NONE][0]['tid'] = $tid_ciudad_ofer;
+          }
+
+          if ($tipo_cuantia == ">"){
+            $node_proceso->field_tipo_cuantia[LANGUAGE_NONE][0]['value'] = "mayor";
+          } else if ($tipo_cuantia == "<"){
+            $node_proceso->field_tipo_cuantia[LANGUAGE_NONE][0]['value'] = "menor";
+          } else {
+            $node_proceso->field_tipo_cuantia[LANGUAGE_NONE][0]['value'] = "igual";
+          }
+
+          if ($tipo_proceso == 'A'){
+            $node_proceso->field_tipo_proceso[LANGUAGE_NONE][0]['value'] = "abierta";
+          } else if ($tipo_proceso == 'C'){
+            $node_proceso->field_tipo_proceso[LANGUAGE_NONE][0]['value'] = "cerrada";
+          } else if ($tipo_proceso == 'D'){
+            $node_proceso->field_tipo_proceso[LANGUAGE_NONE][0]['value'] = "directa";
+          }
+
+          $node_proceso->field_fecha_proceso[LANGUAGE_NONE][0]['value'] = strtotime($fecha_inicio);
+          $node_proceso->field_fecha_proceso[LANGUAGE_NONE][0]['value2'] = strtotime($fecha_fin);
+          $node_proceso->timezone = "America/Bogota";
+          $node_proceso->timezone_db = "America/Bogota";
+
+          $node_proceso->field_tipo_de_contrato[LANGUAGE_NONE][0]['tid'] = $tid_tipo_contrato;
+
+          $file_funcionarios = fopen($path_funcionarios, 'r');
+
+          while (($line_funcionarios = fgetcsv($file_funcionarios)) !== FALSE) {
+            $registro_func_id = $line_funcionarios[0];
+            $registro_func_user_id = $line_funcionarios[1];
+
+            if ($registro_func_id == $funcionario_id){
+              $uid_func = get_uid_usuario($registro_func_user_id);
+
+              if ($uid_func > 1){
+                //actualizar dependencia
+                $node_proceso->field_usuario_dependencia[LANGUAGE_NONE][0]['target_id'] = $uid_func;
+
+                $userobj = user_load($uid_func);
+
+                $entidad_dependencia = $userobj->field_dependencia[LANGUAGE_NONE][0]['tid'];
+
+                if ($entidad_dependencia){ 
+                  $node_proceso->field_dependencia[LANGUAGE_NONE][0]['tid'] = $entidad_dependencia;
+                }    
+              }  
+
+              break;        
+            }
+          }
+
+          node_save($node_proceso);
+
+          //actualizar directamente en la BD las fechas de creacion y actualizacion
+          $timestamp_creation = strtotime($fecha_creacion);
+          $timestamp_modification = strtotime($fecha_modificacion);
+
+          if (!($timestamp_creation > 0)){
+            $timestamp_creation = time();
+          }
+
+          if (!($timestamp_modification > 0)){
+            $timestamp_modification = time();
+          }
+
+          //poner la fecha real de creacion y modificacion
+          //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+          $nuevonid = $nuevonodo->nid;
+
+          //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+          $updated = db_update('node')
+            ->fields(array(
+              'created' => $timestamp_creation,
+              'changed' => $timestamp_modification,
+            ))
+            ->condition('nid', $nuevonid, '=')
+            ->execute();
+
+          if ($updated < 1){
+            drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $nuevonid)), "status");
+          }
+
+          $arreglo_updated[] = $nuevonodo->nid;
+          $index_updated++;
+          $last_record = $id;
+        }
+      }
+
+    }
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_validar_archivos_eventos(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/archivo-evento.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+    $id = $line[0];
+
+    if($line[0]){
+
+      if ($id == "id_evento"){
+        continue;
+      }
+
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      //mirar si el evento existe, de lo contrario actualizarlo (en este caso actualizar estado y status only)
+      $result = db_query("SELECT entity_id FROM field_data_field_id_anterior WHERE bundle = 'evento' AND field_id_anterior_value = :contenido_id LIMIT 1", array(":contenido_id" => $id))->fetchAssoc();
+
+
+      if (!empty($result['entity_id'])){
+        $arreglo_updated[] = $result['entity_id'];
+        $index_updated++;
+        $last_record = $id;
+      } else {
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;
+        $last_record = $id;
+      }
+    }
+
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents'); 
+}
+
+function _adc_migration_imagenes_body_noticias_publicaciones(){
+  //path to migration file
+  $path = DRUPAL_ROOT . '/sites/default/files/migration/contenidos-noticias.csv';
+  $updated_nodes = "/tmp/updated.json";
+  $notupdated_nodes = "/tmp/notupdated.json";
+
+  //read csv file
+  $file = fopen($path, 'r');
+
+  //count for updated and not updated
+  $index_updated = 0;
+  $index_not_updated = 0;
+  $arreglo_updated = array();
+  $arreglo_notupdated = array();
+  $last_record = "";
+
+  while (($line = fgetcsv($file)) !== FALSE) {
+    $id = $line[0];
+
+    if($line[0]){
+      $id = str_replace(".", "", $id);
+      $id = str_replace(",", "", $id);
+
+      $id = (int) $id;
+
+      if ($id == "id_contenido"){
+        continue;
+      }
+
+      //extraer el nid asociado a ese id_anterior
+      $result = db_query("SELECT entity_id FROM field_data_field_contenido_id WHERE bundle IN ('article', 'page') AND field_contenido_id_value = :id_anterior", array(":id_anterior" => $id))->fetchAssoc();
+
+      //realizar las actualizaciones necesarias a nivel de db
+      if (!empty($result['entity_id'])){
+        //extraer la informacion
+        $autor = $line[9];
+        $summary = $line[10];
+        $imagen_id = $line[12];
+        $estado_publicacion = $line[15];
+        $fecha_inicio = $line[16];
+        $fecha_fin = $line[17];
+        $id_usuario_creacion = $line[18];
+        $fecha_creacion = $line[19];
+        $fecha_modificacion = $line[21];
+        $contenido1 = $line[24];
+        $contenido2 = $line[25];
+        $contenido3 = $line[26];
+
+        $nodo_contenido = node_load($result["entity_id"]);
+
+        $body_completo = $nodo_contenido->body[LANGUAGE_NONE][0]['value'];
+
+        if (strpos($body_completo, "http://artesaniasdecolombia.com.co/PortalAC/images/")){
+          $doc = new DOMDocument();
+          $doc->loadHTML($body_completo);
+          $items = $doc->getElementsByTagName('img');
+
+          $nuevo_html = $body_completo;
+
+          foreach ($items as $item){ 
+              $imagen_vieja = $item->getAttribute('src');
+
+              if (strpos($imagen_vieja, "artesaniasdecolombia.com.co/PortalAC/images/")){
+                $pieces = explode("/", $imagen_vieja);
+
+                $file_temp = file_get_contents($imagen_vieja);
+
+                if ($file_temp){
+                  if (isset($pieces[5]) && !empty($pieces[5])){ 
+                    $path_imagen2 = "public://imagenes/" . $pieces[5];
+                  } else {
+                    $path_imagen2 = "public://imagenes/";
+                  }
+
+                  $new_url_path = file_unmanaged_save_data($file_temp, $path_imagen2, FILE_EXISTS_RENAME);
+
+                  $url_real = file_create_url($new_url_path);
+
+                  $nuevo_html = str_replace($imagen_vieja, $url_real, $nuevo_html);
+
+                  file_put_contents("/tmp/nuevaurl.json", json_encode($url_real));
+                  file_put_contents("/tmp/oldurl.json", json_encode($imagen_vieja));
+                  file_put_contents("/tmp/nuevohtml.json", json_encode($nuevo_html));
+
+                  drupal_set_message(t("Url vieja @imagen en el nodo @nid", array("@imagen" => $imagen_vieja, "@nid" => $result["entity_id"])), "status");
+                } else {
+                  drupal_set_message(t("La siguiente imagen no se encontro en artesaniasdecolombia.com.co O HAY UN DELAY: @imagen", array("@imagen" => $path_imagen_remoto)), "status");
+                }
+              }
+
+          }
+
+          $nodo_contenido->body[LANGUAGE_NONE][0]['value'] = $nuevo_html;
+        }
+
+        node_save($nodo_contenido);    
+
+        //actualizar directamente en la BD las fechas de creacion y actualizacion
+        $timestamp_creation = strtotime($fecha_creacion);
+        $timestamp_modification = strtotime($fecha_modificacion);
+
+        if (!($timestamp_creation > 0)){
+          $timestamp_creation = time();
+        }
+
+        if (!($timestamp_modification > 0)){
+            $timestamp_modification = time();
+        }
+
+        //UPDATE node SET created = :timestamp_created, changed = :timestamp_changed  WHERE nid = :id
+        $updated = db_update('node')
+            ->fields(array(
+                'created' => $timestamp_creation,
+                'changed' => $timestamp_modification,
+              ))
+              ->condition('nid', $result['entity_id'], '=')
+              ->execute();
+
+        if ($updated < 1){
+          drupal_set_message(t("Timestamp created and changed not updated for node: @node", array("@node" => $result['entity_id'])), "status");
+        }
+
+        $arreglo_updated[] = $result['entity_id'];
+        $index_updated++;
+        $last_record = $id;    
+
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record)); 
+      } else {
+        $arreglo_notupdated[] = $id;
+        $index_not_updated++;
+        $last_record = $id;
+
+        drupal_set_message(t("Registro que no existe: @id", array("@id" => $id)), "status");
+
+        file_put_contents("/tmp/lastrecord.json", json_encode($last_record));        
+      }
+    }
+  }
+
+  fclose($file);
+
+  drupal_set_message(t("Records updated: @records_updated", array("@records_updated" => $index_updated)), "status");
+  drupal_set_message(t("Records not updated: @records_notupdated", array("@records_notupdated" => $index_not_updated)), "status");
+
+  file_put_contents($updated_nodes, json_encode($arreglo_updated));
+  file_put_contents($notupdated_nodes, json_encode($arreglo_notupdated));
+
+  return t('Done Updating Contents');     
+}

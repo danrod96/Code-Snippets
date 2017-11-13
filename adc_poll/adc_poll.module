@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Implements hook_form_alter().
  */
 function adc_poll_form_alter(&$form, &$form_state, $form_id) {
